@@ -98,7 +98,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
-            Warehouse Manager
+            Sri 4 Way Invantory Management Portal
           </Typography>
         </Toolbar>
       </AppBar>
