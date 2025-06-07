@@ -8,6 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { OutwardInvoice } from '../../models/OutwardInvoice';
+import { DELETE_OUTWARD_INVOICE_URL, GET_ALL_OUTWARD_INVOICES_URL } from '../../Config';
 
 const OutwardInvoices: React.FC = () => {
   const [invoices, setInvoices] = useState<OutwardInvoice[]>([]);
@@ -16,7 +17,7 @@ const OutwardInvoices: React.FC = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const response = await axios.get<OutwardInvoice[]>(`${process.env.REACT_APP_API_URL}/outward-invoices`);
+        const response = await axios.get<OutwardInvoice[]>(GET_ALL_OUTWARD_INVOICES_URL);
         setInvoices(response.data);
       } catch (error) {
         console.error('Error fetching outward invoices:', error);
@@ -28,7 +29,7 @@ const OutwardInvoices: React.FC = () => {
   const handleDelete = async (invoiceNumber: string) => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       try {
-        await axios.delete(`${process.env.REACT_APP_API_URL}/outward-invoices/${invoiceNumber}`);
+        await axios.get(`${DELETE_OUTWARD_INVOICE_URL}${invoiceNumber}`);
         setInvoices(invoices.filter((invoice) => invoice.invoiceNumber !== invoiceNumber));
       } catch (error) {
         console.error('Error deleting invoice:', error);

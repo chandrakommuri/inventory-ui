@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Product } from '../../models/Product';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { CREATE_INWARD_INVOICE_URL, GET_ALL_PRODUCTS_URL } from '../../Config';
 
 const AddInwardInvoice: React.FC = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const AddInwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get<Product[]>(`${process.env.REACT_APP_API_URL}/products`);
+        const response = await axios.get<Product[]>(GET_ALL_PRODUCTS_URL);
         setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -101,7 +102,13 @@ const AddInwardInvoice: React.FC = () => {
     };
 
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/inward-invoices`, formattedValues);
+      const formData = new URLSearchParams();
+      formData.append("payload", JSON.stringify(formattedValues));
+      await axios.post(CREATE_INWARD_INVOICE_URL, formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
       navigate('/inward-invoices');
     } catch (error) {
       console.error('Error adding invoice:', error);

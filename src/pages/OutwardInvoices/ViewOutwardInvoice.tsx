@@ -18,6 +18,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { OutwardInvoice } from '../../models/OutwardInvoice';
+import { GET_OUTWARD_INVOICE_URL } from '../../Config';
 
 const ViewOutwardInvoice: React.FC = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const ViewOutwardInvoice: React.FC = () => {
     const fetchInvoice = async () => {
       try {
         const response = await axios.get<OutwardInvoice>(
-          `${process.env.REACT_APP_API_URL}/outward-invoices/${invoiceNumber}`
+          `${GET_OUTWARD_INVOICE_URL}${invoiceNumber}`
         );
         setInvoice(response.data);
       } catch (error) {

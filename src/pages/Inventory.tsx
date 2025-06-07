@@ -3,6 +3,7 @@ import axios from 'axios';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { TextField, Paper } from '@mui/material';
 import { Product } from '../models/Product';
+import { GET_ALL_PRODUCTS_URL } from '../Config';
 
 const Inventory: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -10,7 +11,7 @@ const Inventory: React.FC = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const response = await axios.get<Product[]>(`${process.env.REACT_APP_API_URL}/products`);
+      const response = await axios.get<Product[]>(GET_ALL_PRODUCTS_URL);
       setProducts(response.data);
     };
     fetchProducts();

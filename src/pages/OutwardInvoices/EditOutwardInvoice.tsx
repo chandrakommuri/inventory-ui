@@ -7,11 +7,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 import axios from 'axios';
 import { OutwardInvoice } from '../../models/OutwardInvoice';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-interface Product {
-  productCode: string;
-  productName: string;
-}
+import { GET_ALL_PRODUCTS_URL, GET_OUTWARD_INVOICE_URL, UPDATE_OUTWARD_INVOICE_URL } from '../../Config';
+import { Product } from '../../models/Product';
 
 const EditOutwardInvoice: React.FC = () => {
   const { invoiceNumber } = useParams<{ invoiceNumber: string }>();
@@ -25,7 +22,7 @@ const EditOutwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get<Product[]>(`${process.env.REACT_APP_API_URL}/products`);
+        const response = await axios.get<Product[]>(GET_ALL_PRODUCTS_URL);
         setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -40,7 +37,7 @@ const EditOutwardInvoice: React.FC = () => {
     const fetchInvoice = async () => {
       try {
         const response = await axios.get<OutwardInvoice>(
-          `${process.env.REACT_APP_API_URL}/outward-invoices/${invoiceNumber}`
+          `${GET_OUTWARD_INVOICE_URL}${invoiceNumber}`
         );
         const invoice = response.data;
 
@@ -96,7 +93,13 @@ const EditOutwardInvoice: React.FC = () => {
     };
 
     try {
-      await axios.put(`${process.env.REACT_APP_API_URL}/outward-invoices/${invoiceNumber}`, formattedValues);
+      const formData = new URLSearchParams();
+      formData.append("payload", JSON.stringify(formattedValues));
+      await axios.post(`${UPDATE_OUTWARD_INVOICE_URL}${invoiceNumber}`, formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
       navigate('/outward-invoices');
     } catch (error) {
       console.error('Error updating invoice:', error);
@@ -200,12 +203,12 @@ const EditOutwardInvoice: React.FC = () => {
                       <Typography variant="h6">Item {index + 1}</Typography>
                       <Autocomplete
                         options={products}
-                        getOptionLabel={(option) => `${option.productCode}-${option.productName}`}
+                        getOptionLabel={(option) => `${option.productCode}-${option.productDescription}`}
                         filterOptions={(options, { inputValue }) =>
                           options.filter(
                             (option) =>
                               option.productCode.toLowerCase().includes(inputValue.toLowerCase()) ||
-                              option.productName.toLowerCase().includes(inputValue.toLowerCase())
+                              option.productDescription.toLowerCase().includes(inputValue.toLowerCase())
                           )
                         }
                         value={

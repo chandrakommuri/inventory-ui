@@ -18,6 +18,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { InwardInvoice } from '../../models/InwardInvoice';
+import { GET_INWARD_INVOICE_URL } from '../../Config';
 
 const ViewInwardInvoice: React.FC = () => {
   const { invoiceNumber } = useParams<{ invoiceNumber: string }>(); // Extract route parameter
@@ -31,7 +32,7 @@ const ViewInwardInvoice: React.FC = () => {
     const fetchInvoice = async () => {
       try {
         const response = await axios.get<InwardInvoice>(
-          `${process.env.REACT_APP_API_URL}/inward-invoices/${invoiceNumber}`
+          `${GET_INWARD_INVOICE_URL}${invoiceNumber}`
         );
         setInvoice(response.data);
       } catch (error) {
