@@ -216,10 +216,12 @@ const AddOutwardInvoice: React.FC = () => {
                               error={
                                 touched.items &&
                                 touched.items[index] &&
-                                Boolean(errors.items?.[index]?.productCode)
+                                Boolean(typeof errors.items?.[index] !== 'string' && errors.items?.[index]?.productCode)
                               }
                               helperText={
-                                touched.items?.[index]?.productCode && errors.items?.[index]?.productCode
+                                touched.items?.[index]?.productCode && 
+                                typeof errors.items?.[index] !== 'string' && 
+                                errors.items?.[index]?.productCode
                               }
                             />
                           )}
@@ -236,9 +238,11 @@ const AddOutwardInvoice: React.FC = () => {
                         error={
                           touched.items &&
                           touched.items[index] &&
-                          Boolean(errors.items?.[index]?.quantity)
+                          Boolean(typeof errors.items?.[index] !== 'string' && errors.items?.[index]?.quantity)
                         }
-                        helperText={touched.items?.[index]?.quantity && errors.items?.[index]?.quantity}
+                        helperText={touched.items?.[index]?.quantity && 
+                          typeof errors.items?.[index] !== 'string' && 
+                          errors.items?.[index]?.quantity}
                       />
                       <TextField
                         name={`items[${index}].imeis`}
@@ -252,9 +256,11 @@ const AddOutwardInvoice: React.FC = () => {
                         error={
                           touched.items &&
                           touched.items[index] &&
-                          Boolean(errors.items?.[index]?.imeis)
+                          Boolean(typeof errors.items?.[index] !== 'string' && errors.items?.[index]?.imeis)
                         }
-                        helperText={touched.items?.[index]?.imeis && errors.items?.[index]?.imeis}
+                        helperText={touched.items?.[index]?.imeis && 
+                          typeof errors.items?.[index] !== 'string' && 
+                          errors.items?.[index]?.imeis}
                       />
                       <Button
                         onClick={() => remove(index)}
