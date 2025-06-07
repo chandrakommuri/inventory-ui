@@ -84,33 +84,33 @@ const ViewInwardInvoice: React.FC = () => {
             Invoice Details
           </Typography>
           <Divider style={{ marginBottom: '10px' }} />
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Invoice Number:</strong> {invoice.invoiceNumber}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Invoice Date:</strong> {invoice.invoiceDate}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Delivery Date:</strong> {invoice.deliveryDate}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Transporter:</strong> {invoice.transporter}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Docket Number:</strong> {invoice.docketNumber}
-              </Typography>
-            </Grid>
-          </Grid>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 2,               // spacing between items (equivalent to spacing={2})
+            }}
+          >
+            {[
+              { label: 'Invoice Number', value: invoice.invoiceNumber },
+              { label: 'Invoice Date', value: invoice.invoiceDate },
+              { label: 'Delivery Date', value: invoice.deliveryDate },
+              { label: 'Transporter', value: invoice.transporter },
+              { label: 'Docket Number', value: invoice.docketNumber },
+            ].map(({ label, value }) => (
+              <Box
+                key={label}
+                sx={{
+                  flex: '1 1 100%',   // full width on small screens
+                  maxWidth: { xs: '100%', sm: '50%' }, // half width on small+ screens
+                }}
+              >
+                <Typography variant="body1">
+                  <strong>{label}:</strong> {value}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
         </CardContent>
       </Card>
 
@@ -137,17 +137,29 @@ const ViewInwardInvoice: React.FC = () => {
                     <TableCell>{item.productCode}</TableCell>
                     <TableCell>{item.quantity}</TableCell>
                     <TableCell>
-                      <Grid container spacing={2}>
-                        {imeiColumns.map((column, columnIndex) => (
-                          <Grid item key={columnIndex} xs={12} sm={6} md={4}>
-                            {column.map((imei, imeiIndex) => (
-                              <Typography key={imeiIndex} variant="body2">
-                                {imei}
-                              </Typography>
-                            ))}
-                          </Grid>
-                        ))}
-                      </Grid>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 2,
+                      }}
+                    >
+                      {imeiColumns.map((column, columnIndex) => (
+                        <Box
+                          key={columnIndex}
+                          sx={{
+                            flex: '1 1 100%',            // full width on xs
+                            maxWidth: { xs: '100%', sm: '50%', md: '33.33%' },  // responsive widths for sm and md
+                          }}
+                        >
+                          {column.map((imei, imeiIndex) => (
+                            <Typography key={imeiIndex} variant="body2">
+                              {imei}
+                            </Typography>
+                          ))}
+                        </Box>
+                      ))}
+                    </Box>
                     </TableCell>
                   </TableRow>
                 );

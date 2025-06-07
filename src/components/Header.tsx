@@ -6,7 +6,7 @@ const Header: React.FC = () => {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" component="div">
-          Warehouse Inventory
+          Sri 4 Way Inventory Management
         </Typography>
       </Toolbar>
     </AppBar>

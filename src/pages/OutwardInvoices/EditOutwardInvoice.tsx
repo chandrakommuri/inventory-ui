@@ -49,6 +49,7 @@ const EditOutwardInvoice: React.FC = () => {
           })),
         };
 
+        // @ts-ignore
         setInitialValues(formattedInvoice);
       } catch (error) {
         console.error('Error fetching invoice:', error);
@@ -223,13 +224,15 @@ const EditOutwardInvoice: React.FC = () => {
                             label="Product Code"
                             margin="normal"
                             error={
-                              touched.items &&
-                              touched.items[index] &&
-                              Boolean(typeof errors.items?.[index] !== 'string' && errors.items?.[index]?.productCode)
+                              touched.items?.[index]?.productCode &&
+                              typeof errors.items?.[index] !== 'string' &&
+                              // @ts-ignore
+                              Boolean(errors.items?.[index]?.productCode)
                             }
                             helperText={
                               touched.items?.[index]?.productCode && 
                               typeof errors.items?.[index] !== 'string' && 
+                              // @ts-ignore
                               errors.items?.[index]?.productCode
                             }
                           />
@@ -244,13 +247,17 @@ const EditOutwardInvoice: React.FC = () => {
                         onChange={handleChange}
                         value={item.quantity}
                         error={
-                          touched.items &&
-                          touched.items[index] &&
-                          Boolean(typeof errors.items?.[index] !== 'string' && errors.items?.[index]?.quantity)
+                          touched.items?.[index]?.quantity &&
+                          typeof errors.items?.[index] !== 'string' &&
+                          // @ts-ignore
+                          Boolean(errors.items?.[index]?.quantity)
                         }
-                        helperText={touched.items?.[index]?.quantity && 
+                        helperText={
+                          touched.items?.[index]?.quantity && 
                           typeof errors.items?.[index] !== 'string' && 
-                          errors.items?.[index]?.quantity}
+                          // @ts-ignore
+                          errors.items?.[index]?.quantity
+                        }
                       />
                       <TextField
                         name={`items[${index}].imeis`}
@@ -262,13 +269,17 @@ const EditOutwardInvoice: React.FC = () => {
                         onChange={handleChange}
                         value={item.imeis}
                         error={
-                          touched.items &&
-                          touched.items[index] &&
-                          Boolean(typeof errors.items?.[index] !== 'string' && errors.items?.[index]?.imeis)
+                          touched.items?.[index]?.imeis &&
+                          typeof errors.items?.[index] !== 'string' &&
+                          // @ts-ignore
+                          Boolean(errors.items?.[index]?.imeis)
                         }
-                        helperText={touched.items?.[index]?.imeis && 
+                        helperText={
+                          touched.items?.[index]?.imeis && 
                           typeof errors.items?.[index] !== 'string' && 
-                          errors.items?.[index]?.imeis}
+                          // @ts-ignore
+                          errors.items?.[index]?.imeis
+                        }
                       />
                       <Button
                         onClick={() => remove(index)}

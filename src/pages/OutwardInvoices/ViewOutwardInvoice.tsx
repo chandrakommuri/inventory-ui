@@ -75,38 +75,34 @@ const ViewOutwardInvoice: React.FC = () => {
             Invoice Details
           </Typography>
           <Divider style={{ marginBottom: '10px' }} />
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Invoice Number:</strong> {invoice.invoiceNumber}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Invoice Date:</strong> {invoice.invoiceDate}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Customer Name:</strong> {invoice.customerName}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Destination:</strong> {invoice.destination}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Transporter:</strong> {invoice.transporter}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Docket Number:</strong> {invoice.docketNumber}
-              </Typography>
-            </Grid>
-          </Grid>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 2,               // spacing between items (equivalent to spacing={2})
+            }}
+          >
+            {[
+              { label: 'Invoice Number', value: invoice.invoiceNumber },
+              { label: 'Invoice Date', value: invoice.invoiceDate },
+              { label: 'Customer Name', value: invoice.customerName },
+              { label: 'Destination', value: invoice.destination },
+              { label: 'Transporter', value: invoice.transporter },
+              { label: 'Docket Number', value: invoice.docketNumber },
+            ].map(({ label, value }) => (
+              <Box
+                key={label}
+                sx={{
+                  flex: '1 1 100%',   // full width on small screens
+                  maxWidth: { xs: '100%', sm: '50%' }, // half width on small+ screens
+                }}
+              >
+                <Typography variant="body1">
+                  <strong>{label}:</strong> {value}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
         </CardContent>
       </Card>
 

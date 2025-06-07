@@ -79,7 +79,7 @@ const OutwardInvoices: React.FC = () => {
           getRowId={(row) => row.invoiceNumber}
           autoHeight
           disableColumnMenu // Optional: Disables the column menu
-          disableSelectionOnClick // Prevents row selection when clicking on a row
+          disableRowSelectionOnClick
           checkboxSelection={false}/>
       </div>
     </Paper>
