@@ -97,8 +97,8 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
-            Sri 4 Way Invantory Management Portal
+          <Typography variant="h5" noWrap>
+            Sri 4 Way Express Invantory Management
           </Typography>
         </Toolbar>
       </AppBar>

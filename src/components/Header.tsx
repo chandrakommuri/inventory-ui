@@ -5,8 +5,8 @@ const Header: React.FC = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" component="div">
-          Sri 4 Way Inventory Management
+        <Typography variant="h5" component="div">
+          Sri 4 Way Express Inventory Management
         </Typography>
       </Toolbar>
     </AppBar>

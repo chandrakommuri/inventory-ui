@@ -17,7 +17,7 @@ import ViewOutwardInvoice from './pages/OutwardInvoices/ViewOutwardInvoice';
 
 const App: React.FC = () => {
   return (
-    <Router basename="/inventory-ui">
+    <Router basename="/">
       <Header />
       <Sidebar>
         <Routes>
