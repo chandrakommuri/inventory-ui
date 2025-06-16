@@ -33,7 +33,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "json-server": "json-server --watch ./mock/db.json --port 5000",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build && cp ./deployment/.htaccess ./build/",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
