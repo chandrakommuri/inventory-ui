@@ -23,7 +23,7 @@ import { GET_OUTWARD_INVOICE_URL } from '../../Config';
 const ViewOutwardInvoice: React.FC = () => {
   const navigate = useNavigate();
 
-  const { invoiceNumber } = useParams<{ invoiceNumber: string }>(); // Extract route parameter
+  const { id } = useParams<{ id: string }>(); // Extract route parameter
   const [invoice, setInvoice] = useState<OutwardInvoice | null>(null); // State to hold invoice data
   const [loading, setLoading] = useState<boolean>(true); // State for loading indicator
 
@@ -32,7 +32,7 @@ const ViewOutwardInvoice: React.FC = () => {
     const fetchInvoice = async () => {
       try {
         const response = await axios.get<OutwardInvoice>(
-          `${GET_OUTWARD_INVOICE_URL}${invoiceNumber}`
+          `${GET_OUTWARD_INVOICE_URL}${id}`
         );
         setInvoice(response.data);
       } catch (error) {
@@ -42,7 +42,7 @@ const ViewOutwardInvoice: React.FC = () => {
       }
     };
     fetchInvoice();
-  }, [invoiceNumber]);
+  }, [id]);
 
   // Show loading indicator while data is being fetched
   if (loading) {
@@ -61,6 +61,15 @@ const ViewOutwardInvoice: React.FC = () => {
       </Typography>
     );
   }
+
+  // Helper function to split IMEIs into columns
+  const splitIMEIsIntoColumns = (imeis: string[], itemsPerColumn: number): string[][] => {
+    const columns: string[][] = [];
+    for (let i = 0; i < imeis.length; i += itemsPerColumn) {
+      columns.push(imeis.slice(i, i + itemsPerColumn));
+    }
+    return columns;
+  };
 
   return (
     <Paper elevation={3} style={{ padding: '20px' }}>
@@ -85,7 +94,7 @@ const ViewOutwardInvoice: React.FC = () => {
             {[
               { label: 'Invoice Number', value: invoice.invoiceNumber },
               { label: 'Invoice Date', value: invoice.invoiceDate },
-              { label: 'Customer Name', value: invoice.customerName },
+              { label: 'Customer Name', value: invoice.customer },
               { label: 'Destination', value: invoice.destination },
               { label: 'Transporter', value: invoice.transporter },
               { label: 'Docket Number', value: invoice.docketNumber },
@@ -122,17 +131,38 @@ const ViewOutwardInvoice: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {invoice.items.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>{item.productCode}</TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2" style={{ whiteSpace: 'pre-wrap' }}>
-                      {item.imeis.join('\n')} {/* Display IMEIs separated by new lines */}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {invoice.items.map((item, index) => {
+                const imeiColumns = splitIMEIsIntoColumns(item.imeis, 10); // Split IMEIs into columns of 10
+                return (
+                  <TableRow key={index}>
+                    <TableCell>{item.code}</TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>
+                    <Box
+                      sx={{
+                        display: 'flex'
+                      }}
+                    >
+                      {imeiColumns.map((column, columnIndex) => (
+                        <Box
+                          key={columnIndex}
+                          sx={{
+                            flex: '1 1 100%',            // full width on xs
+                            maxWidth: { xs: '100%', sm: '50%', md: '33.33%' },  // responsive widths for sm and md
+                          }}
+                        >
+                          {column.map((imei, imeiIndex) => (
+                            <Typography key={imeiIndex} variant="body2">
+                              {imei}
+                            </Typography>
+                          ))}
+                        </Box>
+                      ))}
+                    </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>

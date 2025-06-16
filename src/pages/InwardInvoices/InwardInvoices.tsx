@@ -23,10 +23,10 @@ const InwardInvoices: React.FC = () => {
     fetchInvoices();
   }, []);
 
-  const handleDelete = async (invoiceNumber: string) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
-      await axios.get(`${DELETE_INWARD_INVOICE_URL}${invoiceNumber}`);
-      setInvoices(invoices.filter((invoice) => invoice.invoiceNumber !== invoiceNumber));
+      await axios.delete(`${DELETE_INWARD_INVOICE_URL}${id}`);
+      setInvoices(invoices.filter((invoice) => invoice.id !== id));
     }
   };
 
@@ -42,13 +42,13 @@ const InwardInvoices: React.FC = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton onClick={() => navigate(`/inward-invoices/view/${params.row.invoiceNumber}`)} color='primary'>
+          <IconButton onClick={() => navigate(`/inward-invoices/view/${params.row.id}`)} color='primary'>
             <VisibilityIcon />
           </IconButton>
-          <IconButton onClick={() => navigate(`/inward-invoices/edit/${params.row.invoiceNumber}`)} color='secondary'>
+          <IconButton onClick={() => navigate(`/inward-invoices/edit/${params.row.id}`)} color='secondary'>
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => handleDelete(params.row.invoiceNumber)} color='error'>
+          <IconButton onClick={() => handleDelete(params.row.id)} color='error'>
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -68,7 +68,7 @@ const InwardInvoices: React.FC = () => {
        <DataGrid
           rows={invoices}
           columns={columns}
-          getRowId={(row) => row.invoiceNumber}
+          getRowId={(row) => row.id}
           initialState={{
             pagination: {
               paginationModel: {

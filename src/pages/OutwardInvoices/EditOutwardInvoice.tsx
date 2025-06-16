@@ -7,11 +7,14 @@ import Autocomplete from '@mui/material/Autocomplete';
 import axios from 'axios';
 import { OutwardInvoice } from '../../models/OutwardInvoice';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { GET_ALL_PRODUCTS_URL, GET_OUTWARD_INVOICE_URL, UPDATE_OUTWARD_INVOICE_URL } from '../../Config';
+import { GET_ALL_CUSTOMERS_URL, GET_ALL_DESTINATIONS_URL, GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_URL, GET_OUTWARD_INVOICE_URL, UPDATE_OUTWARD_INVOICE_URL } from '../../Config';
 import { Product } from '../../models/Product';
+import { Customer } from '../../models/Customer';
+import { Destination } from '../../models/Destination';
+import { Transporter } from '../../models/Transporter';
 
 const EditOutwardInvoice: React.FC = () => {
-  const { invoiceNumber } = useParams<{ invoiceNumber: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const [initialValues, setInitialValues] = useState<OutwardInvoice | null>(null);
@@ -33,11 +36,68 @@ const EditOutwardInvoice: React.FC = () => {
     fetchProducts();
   }, []);
 
+  // State to hold the list of customers
+  const [customers, setCustomer] = useState<Customer[]>([]);
+  const [loadingCustomers, setLoadingCustomer] = useState<boolean>(true);
+
+  // Fetch customers from the API
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const response = await axios.get<Customer[]>(GET_ALL_CUSTOMERS_URL);
+        setCustomer(response.data);
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      } finally {
+        setLoadingCustomer(false);
+      }
+    };
+    fetchCustomer();
+  }, []);
+
+  // State to hold the list of destinations
+  const [destinations, setDestination] = useState<Destination[]>([]);
+  const [loadingDestinations, setLoadingDestination] = useState<boolean>(true);
+
+  // Fetch destinations from the API
+  useEffect(() => {
+    const fetchDestination = async () => {
+      try {
+        const response = await axios.get<Destination[]>(GET_ALL_DESTINATIONS_URL);
+        setDestination(response.data);
+      } catch (error) {
+        console.error('Error fetching destinations:', error);
+      } finally {
+        setLoadingDestination(false);
+      }
+    };
+    fetchDestination();
+  }, []);
+
+  // State to hold the list of transporters
+  const [transporters, setTransporters] = useState<Transporter[]>([]);
+  const [loadingTransporters, setLoadingTransporters] = useState<boolean>(true);
+
+  // Fetch transporters from the API
+  useEffect(() => {
+    const fetchTransporters = async () => {
+      try {
+        const response = await axios.get<Transporter[]>(GET_ALL_TRANSPORTERS_URL);
+        setTransporters(response.data);
+      } catch (error) {
+        console.error('Error fetching transporters:', error);
+      } finally {
+        setLoadingTransporters(false);
+      }
+    };
+    fetchTransporters();
+  }, []);
+
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
         const response = await axios.get<OutwardInvoice>(
-          `${GET_OUTWARD_INVOICE_URL}${invoiceNumber}`
+          `${GET_OUTWARD_INVOICE_URL}${id}`
         );
         const invoice = response.data;
 
@@ -58,18 +118,18 @@ const EditOutwardInvoice: React.FC = () => {
       }
     };
     fetchInvoice();
-  }, [invoiceNumber]);
+  }, [id]);
 
   const validationSchema = Yup.object().shape({
     invoiceNumber: Yup.string().required('Invoice Number is required'),
     invoiceDate: Yup.string().required('Invoice Date is required'),
-    customerName: Yup.string().required('Customer Name is required'),
+    customer: Yup.string().required('Customer Name is required'),
     destination: Yup.string().required('Destination is required'),
     transporter: Yup.string().required('Transporter is required'),
     docketNumber: Yup.string().required('Docket Number is required'),
     items: Yup.array().of(
       Yup.object().shape({
-        productCode: Yup.string().required('Product Code is required'),
+        productId: Yup.string().required('Product is required'),
         quantity: Yup.number()
           .required('Quantity is required')
           .min(1, 'Quantity must be at least 1'),
@@ -94,11 +154,9 @@ const EditOutwardInvoice: React.FC = () => {
     };
 
     try {
-      const formData = new URLSearchParams();
-      formData.append("payload", JSON.stringify(formattedValues));
-      await axios.post(`${UPDATE_OUTWARD_INVOICE_URL}${invoiceNumber}`, formData, {
+      await axios.put(`${UPDATE_OUTWARD_INVOICE_URL}${id}`, formattedValues, {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
       });
       navigate('/outward-invoices');
@@ -152,36 +210,87 @@ const EditOutwardInvoice: React.FC = () => {
               error={touched.invoiceDate && Boolean(errors.invoiceDate)}
               helperText={touched.invoiceDate && errors.invoiceDate}
             />
-            <TextField
-              name="customerName"
-              label="Customer Name"
-              fullWidth
-              margin="normal"
-              onChange={handleChange}
-              value={values.customerName}
-              error={touched.customerName && Boolean(errors.customerName)}
-              helperText={touched.customerName && errors.customerName}
-            />
-            <TextField
-              name="destination"
-              label="Destination"
-              fullWidth
-              margin="normal"
-              onChange={handleChange}
-              value={values.destination}
-              error={touched.destination && Boolean(errors.destination)}
-              helperText={touched.destination && errors.destination}
-            />
-            <TextField
-              name="transporter"
-              label="Transporter"
-              fullWidth
-              margin="normal"
-              onChange={handleChange}
-              value={values.transporter}
-              error={touched.transporter && Boolean(errors.transporter)}
-              helperText={touched.transporter && errors.transporter}
-            />
+            {loadingCustomers ? (
+              <CircularProgress size={24} />
+            ) : (
+              <Autocomplete
+                options={customers}
+                getOptionLabel={(option) => `${option.name}`}
+                filterOptions={(options, { inputValue }) =>
+                  options.filter((option) =>option.name.toLowerCase().includes(inputValue.toLowerCase()))
+                }
+                value={
+                  customers.find((customer) => customer.id === values.customerId) || null
+                }
+                onChange={(event, value) => {
+                  // Set the customerId in Formik when a customerI is selected
+                  setFieldValue(`customerId`, value?.id || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Customer"
+                    margin="normal"
+                    error={touched.customerId && Boolean(errors.customerId)}
+                    helperText={touched.customerId && errors.customerId}
+                  />
+                )}
+              />
+            )}
+            {loadingDestinations ? (
+              <CircularProgress size={24} />
+            ) : (
+              <Autocomplete
+                options={destinations}
+                getOptionLabel={(option) => `${option.name}`}
+                filterOptions={(options, { inputValue }) =>
+                  options.filter((option) =>option.name.toLowerCase().includes(inputValue.toLowerCase()))
+                }
+                value={
+                  destinations.find((destination) => destination.id === values.destinationId) || null
+                }
+                onChange={(event, value) => {
+                  // Set the destinationId in Formik when a destination is selected
+                  setFieldValue(`destinationId`, value?.id || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Destination"
+                    margin="normal"
+                    error={touched.destinationId && Boolean(errors.destinationId)}
+                    helperText={touched.destinationId && errors.destinationId}
+                  />
+                )}
+              />
+            )}
+            {loadingTransporters ? (
+              <CircularProgress size={24} />
+            ) : (
+              <Autocomplete
+                options={transporters}
+                getOptionLabel={(option) => `${option.name}`}
+                filterOptions={(options, { inputValue }) =>
+                  options.filter((option) =>option.name.toLowerCase().includes(inputValue.toLowerCase()))
+                }
+                value={
+                  transporters.find((transporter) => transporter.id === values.transporterId) || null
+                }
+                onChange={(event, value) => {
+                  // Set the transporterId in Formik when a transporter is selected
+                  setFieldValue(`transporterId`, value?.id || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Transporter"
+                    margin="normal"
+                    error={touched.transporterId && Boolean(errors.transporterId)}
+                    helperText={touched.transporterId && errors.transporterId}
+                  />
+                )}
+              />
+            )}
             <TextField
               name="docketNumber"
               label="Docket Number"
@@ -204,19 +313,19 @@ const EditOutwardInvoice: React.FC = () => {
                       <Typography variant="h6">Item {index + 1}</Typography>
                       <Autocomplete
                         options={products}
-                        getOptionLabel={(option) => `${option.productCode}-${option.productDescription}`}
+                        getOptionLabel={(option) => `${option.code}-${option.description}`}
                         filterOptions={(options, { inputValue }) =>
                           options.filter(
                             (option) =>
-                              option.productCode.toLowerCase().includes(inputValue.toLowerCase()) ||
-                              option.productDescription.toLowerCase().includes(inputValue.toLowerCase())
+                              option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+                              option.description.toLowerCase().includes(inputValue.toLowerCase())
                           )
                         }
                         value={
-                          products.find((product) => product.productCode === item.productCode) || null
+                          products.find((product) => product.id === item.productId) || null
                         }
                         onChange={(event, value) => {
-                          setFieldValue(`items[${index}].productCode`, value?.productCode || '');
+                          setFieldValue(`items[${index}].productId`, value?.id || '');
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -224,16 +333,16 @@ const EditOutwardInvoice: React.FC = () => {
                             label="Product Code"
                             margin="normal"
                             error={
-                              touched.items?.[index]?.productCode &&
+                              touched.items?.[index]?.productId &&
                               typeof errors.items?.[index] !== 'string' &&
                               // @ts-ignore
-                              Boolean(errors.items?.[index]?.productCode)
+                              Boolean(errors.items?.[index]?.productId)
                             }
                             helperText={
-                              touched.items?.[index]?.productCode && 
+                              touched.items?.[index]?.productId && 
                               typeof errors.items?.[index] !== 'string' && 
                               // @ts-ignore
-                              errors.items?.[index]?.productCode
+                              errors.items?.[index]?.productId
                             }
                           />
                         )}
@@ -293,7 +402,7 @@ const EditOutwardInvoice: React.FC = () => {
                     </Box>
                   ))}
                   <Button
-                    onClick={() => push({ productCode: '', quantity: 0, imeis: '' })}
+                    onClick={() => push({ productId: '', quantity: 0, imeis: '' })}
                     variant="contained"
                     color="secondary"
                     style={{ marginTop: '20px' }}

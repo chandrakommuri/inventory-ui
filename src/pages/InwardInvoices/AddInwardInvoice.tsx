@@ -8,7 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { Product } from '../../models/Product';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { CREATE_INWARD_INVOICE_URL, GET_ALL_PRODUCTS_URL } from '../../Config';
+import { CREATE_INWARD_INVOICE_URL, GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_URL } from '../../Config';
+import { Transporter } from '../../models/Transporter';
 
 const AddInwardInvoice: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +33,25 @@ const AddInwardInvoice: React.FC = () => {
     fetchProducts();
   }, []);
 
+  // State to hold the list of transporters
+  const [transporters, setTransporters] = useState<Transporter[]>([]);
+  const [loadingTransporters, setLoadingTransporters] = useState<boolean>(true);
+
+  // Fetch transporters from the API
+  useEffect(() => {
+    const fetchTransporters = async () => {
+      try {
+        const response = await axios.get<Transporter[]>(GET_ALL_TRANSPORTERS_URL);
+        setTransporters(response.data);
+      } catch (error) {
+        console.error('Error fetching transporters:', error);
+      } finally {
+        setLoadingTransporters(false);
+      }
+    };
+    fetchTransporters();
+  }, []);
+
   // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split('T')[0];
 
@@ -40,9 +60,9 @@ const AddInwardInvoice: React.FC = () => {
     invoiceNumber: '',
     invoiceDate: '',
     deliveryDate: '',
-    transporter: '',
+    transporterId: '',
     docketNumber: '',
-    items: [{ productCode: '', quantity: 0, imeis: '' }], // IMEIs as a single string
+    items: [{ productId: '', quantity: 0, imeis: '' }], // IMEIs as a single string
   };
 
   // Validation schema for the form using Yup
@@ -58,11 +78,11 @@ const AddInwardInvoice: React.FC = () => {
       .test('not-future-date', 'Delivery Date cannot be a future date', (value) => {
         return value ? new Date(value) <= new Date() : true;
       }),
-    transporter: Yup.string().required('Transporter is required'),
+    transporterId: Yup.string().required('Transporter is required'),
     docketNumber: Yup.string().required('Docket Number is required'),
     items: Yup.array().of(
       Yup.object().shape({
-        productCode: Yup.string().required('Product Code is required'),
+        productId: Yup.string().required('Product is required'),
         quantity: Yup.number()
           .required('Quantity is required')
           .min(1, 'Quantity must be at least 1'),
@@ -102,11 +122,9 @@ const AddInwardInvoice: React.FC = () => {
     };
 
     try {
-      const formData = new URLSearchParams();
-      formData.append("payload", JSON.stringify(formattedValues));
-      await axios.post(CREATE_INWARD_INVOICE_URL, formData, {
+      await axios.post(CREATE_INWARD_INVOICE_URL, formattedValues, {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
       });
       navigate('/inward-invoices');
@@ -160,16 +178,30 @@ const AddInwardInvoice: React.FC = () => {
               error={touched.deliveryDate && Boolean(errors.deliveryDate)}
               helperText={touched.deliveryDate && errors.deliveryDate}
             />
-            <TextField
-              name="transporter"
-              label="Transporter"
-              fullWidth
-              margin="normal"
-              onChange={handleChange}
-              value={values.transporter}
-              error={touched.transporter && Boolean(errors.transporter)}
-              helperText={touched.transporter && errors.transporter}
-            />
+            {loadingTransporters ? (
+              <CircularProgress size={24} />
+            ) : (
+              <Autocomplete
+                options={transporters}
+                getOptionLabel={(option) => `${option.name}`}
+                filterOptions={(options, { inputValue }) =>
+                  options.filter((option) =>option.name.toLowerCase().includes(inputValue.toLowerCase()))
+                }
+                onChange={(event, value) => {
+                  // Set the transporterId in Formik when a transporter is selected
+                  setFieldValue(`transporterId`, value?.id || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Transporter"
+                    margin="normal"
+                    error={touched.transporterId && Boolean(errors.transporterId)}
+                    helperText={touched.transporterId && errors.transporterId}
+                  />
+                )}
+              />
+            )}
             <TextField
               name="docketNumber"
               label="Docket Number"
@@ -196,17 +228,17 @@ const AddInwardInvoice: React.FC = () => {
                       ) : (
                         <Autocomplete
                           options={products}
-                          getOptionLabel={(option) => `${option.productCode}-${option.productDescription}`}
+                          getOptionLabel={(option) => `${option.code}-${option.description}`}
                           filterOptions={(options, { inputValue }) =>
                             options.filter(
                               (option) =>
-                                option.productCode.toLowerCase().includes(inputValue.toLowerCase()) ||
-                                option.productDescription.toLowerCase().includes(inputValue.toLowerCase())
+                                option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+                                option.description.toLowerCase().includes(inputValue.toLowerCase())
                             )
                           }
                           onChange={(event, value) => {
-                            // Set the productCode in Formik when a product is selected
-                            setFieldValue(`items[${index}].productCode`, value?.productCode || '');
+                            // Set the productId in Formik when a product is selected
+                            setFieldValue(`items[${index}].productId`, value?.id || '');
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -214,16 +246,16 @@ const AddInwardInvoice: React.FC = () => {
                               label="Product Code"
                               margin="normal"
                               error={
-                                touched.items?.[index]?.productCode &&
+                                touched.items?.[index]?.productId &&
                                 typeof errors.items?.[index] !== 'string' &&
                                 // @ts-ignore
-                                Boolean(errors.items?.[index]?.productCode)
+                                Boolean(errors.items?.[index]?.productId)
                               }
                               helperText={
-                                touched.items?.[index]?.productCode && 
+                                touched.items?.[index]?.productId && 
                                 typeof errors.items?.[index] !== 'string' && 
                                 // @ts-ignore
-                                errors.items?.[index]?.productCode
+                                errors.items?.[index]?.productId
                               }
                             />
                           )}
@@ -284,7 +316,7 @@ const AddInwardInvoice: React.FC = () => {
                     </Box>
                   ))}
                   <Button
-                    onClick={() => push({ productCode: '', quantity: 0, imeis: '' })}
+                    onClick={() => push({ productId: '', quantity: 0, imeis: '' })}
                     variant="contained"
                     color="secondary"
                     style={{ marginTop: '20px' }}

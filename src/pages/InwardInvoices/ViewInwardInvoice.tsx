@@ -21,7 +21,7 @@ import { InwardInvoice } from '../../models/InwardInvoice';
 import { GET_INWARD_INVOICE_URL } from '../../Config';
 
 const ViewInwardInvoice: React.FC = () => {
-  const { invoiceNumber } = useParams<{ invoiceNumber: string }>(); // Extract route parameter
+  const { id } = useParams<{ id: string }>(); // Extract route parameter
   const [invoice, setInvoice] = useState<InwardInvoice | null>(null); // State to hold invoice data
   const [loading, setLoading] = useState<boolean>(true); // State for loading indicator
 
@@ -32,7 +32,7 @@ const ViewInwardInvoice: React.FC = () => {
     const fetchInvoice = async () => {
       try {
         const response = await axios.get<InwardInvoice>(
-          `${GET_INWARD_INVOICE_URL}${invoiceNumber}`
+          `${GET_INWARD_INVOICE_URL}${id}`
         );
         setInvoice(response.data);
       } catch (error) {
@@ -42,7 +42,7 @@ const ViewInwardInvoice: React.FC = () => {
       }
     };
     fetchInvoice();
-  }, [invoiceNumber]);
+  }, [id]);
 
   // Show loading indicator while data is being fetched
   if (loading) {
@@ -134,14 +134,12 @@ const ViewInwardInvoice: React.FC = () => {
                 const imeiColumns = splitIMEIsIntoColumns(item.imeis, 10); // Split IMEIs into columns of 10
                 return (
                   <TableRow key={index}>
-                    <TableCell>{item.productCode}</TableCell>
+                    <TableCell>{item.code}</TableCell>
                     <TableCell>{item.quantity}</TableCell>
                     <TableCell>
                     <Box
                       sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: 2,
+                        display: 'flex'
                       }}
                     >
                       {imeiColumns.map((column, columnIndex) => (

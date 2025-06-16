@@ -14,11 +14,12 @@ import Autocomplete from '@mui/material/Autocomplete';
 import axios from 'axios';
 import { InwardInvoice } from '../../models/InwardInvoice';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { GET_ALL_PRODUCTS_URL, GET_INWARD_INVOICE_URL, UPDATE_INWARD_INVOICE_URL } from '../../Config';
+import { GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_URL, GET_INWARD_INVOICE_URL, UPDATE_INWARD_INVOICE_URL } from '../../Config';
 import { Product } from '../../models/Product';
+import { Transporter } from '../../models/Transporter';
 
 const EditInwardInvoice: React.FC = () => {
-  const { invoiceNumber } = useParams<{ invoiceNumber: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   // State to hold initial form values
@@ -44,12 +45,31 @@ const EditInwardInvoice: React.FC = () => {
     fetchProducts();
   }, []);
 
+  // State to hold the list of transporters
+  const [transporters, setTransporters] = useState<Transporter[]>([]);
+  const [loadingTransporters, setLoadingTransporters] = useState<boolean>(true);
+
+  // Fetch transporters from the API
+  useEffect(() => {
+    const fetchTransporters = async () => {
+      try {
+        const response = await axios.get<Transporter[]>(GET_ALL_TRANSPORTERS_URL);
+        setTransporters(response.data);
+      } catch (error) {
+        console.error('Error fetching transporters:', error);
+      } finally {
+        setLoadingTransporters(false);
+      }
+    };
+    fetchTransporters();
+  }, []);
+
   // Fetch invoice details and format IMEIs as newline-separated strings
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
         const response = await axios.get<InwardInvoice>(
-          `${GET_INWARD_INVOICE_URL}${invoiceNumber}`
+          `${GET_INWARD_INVOICE_URL}${id}`
         );
         const invoice = response.data;
 
@@ -71,7 +91,7 @@ const EditInwardInvoice: React.FC = () => {
       }
     };
     fetchInvoice();
-  }, [invoiceNumber]);
+  }, [id]);
 
   // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split('T')[0];
@@ -89,11 +109,11 @@ const EditInwardInvoice: React.FC = () => {
       .test('not-future-date', 'Delivery Date cannot be a future date', (value) => {
         return value ? new Date(value) <= new Date() : true;
       }),
-    transporter: Yup.string().required('Transporter is required'),
+    transporterId: Yup.string().required('Transporter is required'),
     docketNumber: Yup.string().required('Docket Number is required'),
     items: Yup.array().of(
       Yup.object().shape({
-        productCode: Yup.string().required('Product Code is required'),
+        productId: Yup.string().required('Product is required'),
         quantity: Yup.number()
           .required('Quantity is required')
           .min(1, 'Quantity must be at least 1'),
@@ -119,11 +139,9 @@ const EditInwardInvoice: React.FC = () => {
     };
 
     try {
-      const formData = new URLSearchParams();
-      formData.append("payload", JSON.stringify(formattedValues));
-      await axios.post(`${UPDATE_INWARD_INVOICE_URL}${invoiceNumber}`, formData, {
+      await axios.put(`${UPDATE_INWARD_INVOICE_URL}${id}`, formattedValues, {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
       });
       navigate('/inward-invoices');
@@ -133,7 +151,7 @@ const EditInwardInvoice: React.FC = () => {
   };
 
   // Show loading indicator while fetching data
-  if (loading || loadingProducts) {
+  if (loading || loadingTransporters || loadingProducts) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
         <CircularProgress />
@@ -194,16 +212,31 @@ const EditInwardInvoice: React.FC = () => {
               error={touched.deliveryDate && Boolean(errors.deliveryDate)}
               helperText={touched.deliveryDate && errors.deliveryDate}
             />
-            <TextField
-              name="transporter"
-              label="Transporter"
-              fullWidth
-              margin="normal"
-              onChange={handleChange}
-              value={values.transporter}
-              error={touched.transporter && Boolean(errors.transporter)}
-              helperText={touched.transporter && errors.transporter}
-            />
+            {loadingTransporters ? (
+              <CircularProgress size={24} />
+            ) : (
+              <Autocomplete
+                options={transporters}
+                getOptionLabel={(option) => `${option.name}`}
+                filterOptions={(options, { inputValue }) =>
+                  options.filter((option) =>option.name.toLowerCase().includes(inputValue.toLowerCase()))
+                }
+                value={transporters.find((transporter) => transporter.id === values.transporterId)}
+                onChange={(event, value) => {
+                  // Set the transporterId in Formik when a transporter is selected
+                  setFieldValue(`transporterId`, value?.id || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Transporter"
+                    margin="normal"
+                    error={touched.transporterId && Boolean(errors.transporterId)}
+                    helperText={touched.transporterId && errors.transporterId}
+                  />
+                )}
+              />
+            )}
             <TextField
               name="docketNumber"
               label="Docket Number"
@@ -227,19 +260,19 @@ const EditInwardInvoice: React.FC = () => {
                       <Typography variant="h6">Item {index + 1}</Typography>
                       <Autocomplete
                         options={products}
-                        getOptionLabel={(option) => `${option.productCode}-${option.productDescription}`}
+                        getOptionLabel={(option) => `${option.code}-${option.description}`}
                         filterOptions={(options, { inputValue }) =>
                           options.filter(
                             (option) =>
-                              option.productCode.toLowerCase().includes(inputValue.toLowerCase()) ||
-                              option.productDescription.toLowerCase().includes(inputValue.toLowerCase())
+                              option.code.toLowerCase().includes(inputValue.toLowerCase()) ||
+                              option.description.toLowerCase().includes(inputValue.toLowerCase())
                           )
                         }
                         value={
-                          products.find((product) => product.productCode === item.productCode) || null
+                          products.find((product) => product.id === item.productId) || null
                         }
                         onChange={(event, value) => {
-                          setFieldValue(`items[${index}].productCode`, value?.productCode || '');
+                          setFieldValue(`items[${index}].productId`, value?.id || '');
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -247,16 +280,16 @@ const EditInwardInvoice: React.FC = () => {
                             label="Product Code"
                             margin="normal"
                             error={
-                              touched.items?.[index]?.productCode &&
+                              touched.items?.[index]?.productId &&
                               typeof errors.items?.[index] !== 'string' &&
                               // @ts-ignore
-                              Boolean(errors.items?.[index]?.productCode)
+                              Boolean(errors.items?.[index]?.productId)
                             }
                             helperText={
-                              touched.items?.[index]?.productCode && 
+                              touched.items?.[index]?.productId && 
                               typeof errors.items?.[index] !== 'string' && 
                               // @ts-ignore
-                              errors.items?.[index]?.productCode
+                              errors.items?.[index]?.productId
                             }
                           />
                         )}
@@ -316,7 +349,7 @@ const EditInwardInvoice: React.FC = () => {
                     </Box>
                   ))}
                   <Button
-                    onClick={() => push({ productCode: '', quantity: 0, imeis: '' })}
+                    onClick={() => push({ productId: '', quantity: 0, imeis: '' })}
                     variant="contained"
                     color="secondary"
                     style={{ marginTop: '20px' }}

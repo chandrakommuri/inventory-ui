@@ -25,13 +25,13 @@ const App: React.FC = () => {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/inward-invoices" element={<InwardInvoices />} />
           <Route path="/inward-invoices/add" element={<AddInwardInvoice />} />
-          <Route path="/inward-invoices/view/:invoiceNumber" element={<ViewInwardInvoice />} />
-          <Route path="/inward-invoices/edit/:invoiceNumber" element={<EditInwardInvoice />} />
+          <Route path="/inward-invoices/view/:id" element={<ViewInwardInvoice />} />
+          <Route path="/inward-invoices/edit/:id" element={<EditInwardInvoice />} />
 
           <Route path="/outward-invoices" element={<OutwardInvoices />} />
           <Route path="/outward-invoices/add" element={<AddOutwardInvoice />} />
-          <Route path="/outward-invoices/view/:invoiceNumber" element={<ViewOutwardInvoice />} />
-          <Route path="/outward-invoices/edit/:invoiceNumber" element={<EditOutwardInvoice />} />
+          <Route path="/outward-invoices/view/:id" element={<ViewOutwardInvoice />} />
+          <Route path="/outward-invoices/edit/:id" element={<EditOutwardInvoice />} />
         </Routes>
       </Sidebar>
     </Router>

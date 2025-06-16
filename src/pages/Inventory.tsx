@@ -18,12 +18,12 @@ const Inventory: React.FC = () => {
   }, []);
 
   const filteredProducts = products.filter((product) =>
-    product.productDescription.toLowerCase().includes(search.toLowerCase())
+    product.description.toLowerCase().includes(search.toLowerCase())
   );
 
   const columns: GridColDef[] = [
-    { field: 'productCode', headerName: 'Product Code', width: 150 },
-    { field: 'productDescription', headerName: 'Product Description', width: 300 },
+    { field: 'code', headerName: 'Product Code', width: 150 },
+    { field: 'description', headerName: 'Product Description', width: 300 },
     { field: 'quantity', headerName: 'Quantity', width: 150 },
   ];
 

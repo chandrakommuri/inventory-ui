@@ -26,11 +26,11 @@ const OutwardInvoices: React.FC = () => {
     fetchInvoices();
   }, []);
 
-  const handleDelete = async (invoiceNumber: string) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       try {
-        await axios.get(`${DELETE_OUTWARD_INVOICE_URL}${invoiceNumber}`);
-        setInvoices(invoices.filter((invoice) => invoice.invoiceNumber !== invoiceNumber));
+        await axios.delete(`${DELETE_OUTWARD_INVOICE_URL}${id}`);
+        setInvoices(invoices.filter((invoice) => invoice.id !== id));
       } catch (error) {
         console.error('Error deleting invoice:', error);
       }
@@ -40,7 +40,7 @@ const OutwardInvoices: React.FC = () => {
   const columns: GridColDef[] = [
     { field: 'invoiceNumber', headerName: 'Invoice Number', width: 150, flex: 1 },
     { field: 'invoiceDate', headerName: 'Invoice Date', width: 150, flex: 1 },
-    { field: 'customerName', headerName: 'Customer Name', width: 200, flex: 1 },
+    { field: 'customer', headerName: 'Customer Name', width: 200, flex: 1 },
     { field: 'destination', headerName: 'Destination', width: 200, flex: 1 },
     { field: 'transporter', headerName: 'Transporter', width: 200, flex: 1 },
     { field: 'docketNumber', headerName: 'Docket Number', width: 150, flex: 1 },
@@ -50,13 +50,13 @@ const OutwardInvoices: React.FC = () => {
       width: 150,
       renderCell: (params) => (
         <Box>
-          <IconButton onClick={() => navigate(`/outward-invoices/view/${params.row.invoiceNumber}`)} color='primary'>
+          <IconButton onClick={() => navigate(`/outward-invoices/view/${params.row.id}`)} color='primary'>
             <VisibilityIcon />
           </IconButton>
-          <IconButton onClick={() => navigate(`/outward-invoices/edit/${params.row.invoiceNumber}`)} color='secondary'>
+          <IconButton onClick={() => navigate(`/outward-invoices/edit/${params.row.id}`)} color='secondary'>
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => handleDelete(params.row.invoiceNumber)} color='error'>
+          <IconButton onClick={() => handleDelete(params.row.id)} color='error'>
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -76,11 +76,16 @@ const OutwardInvoices: React.FC = () => {
         <DataGrid 
           rows={invoices} 
           columns={columns} 
-          getRowId={(row) => row.invoiceNumber}
-          autoHeight
-          disableColumnMenu // Optional: Disables the column menu
-          disableRowSelectionOnClick
-          checkboxSelection={false}/>
+          getRowId={(row) => row.id}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 10,
+              },
+            },
+          }}
+          pageSizeOptions={[10, 20, 50, 100]}
+          />
       </div>
     </Paper>
   );
