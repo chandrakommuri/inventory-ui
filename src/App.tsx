@@ -14,6 +14,7 @@ import OutwardInvoices from './pages/OutwardInvoices/OutwardInvoices';
 import AddOutwardInvoice from './pages/OutwardInvoices/AddOutwardInvoice';
 import EditOutwardInvoice from './pages/OutwardInvoices/EditOutwardInvoice';
 import ViewOutwardInvoice from './pages/OutwardInvoices/ViewOutwardInvoice';
+import StockMovementPage from './pages/StockMovementPage';
 
 const App: React.FC = () => {
   return (
@@ -32,6 +33,8 @@ const App: React.FC = () => {
           <Route path="/outward-invoices/add" element={<AddOutwardInvoice />} />
           <Route path="/outward-invoices/view/:id" element={<ViewOutwardInvoice />} />
           <Route path="/outward-invoices/edit/:id" element={<EditOutwardInvoice />} />
+
+          <Route path="/stock-movement" element={<StockMovementPage />} />
         </Routes>
       </Sidebar>
     </Router>

@@ -65,28 +65,27 @@ const OutwardInvoices: React.FC = () => {
   ];
 
   return (
-    <Paper elevation={3} style={{ padding: '20px' }}>
+    <Paper elevation={3} sx={{ padding: '20px', transition: 'height 0.3s ease' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="20px">
         <h2>Outward Invoices</h2>
         <Button variant="contained" color="primary" onClick={() => navigate('/outward-invoices/add')} startIcon={<AddIcon />}>
           Add Invoice
         </Button>
       </Box>
-      <div style={{ height: 400, width: '100%' }}>
-        <DataGrid 
-          rows={invoices} 
-          columns={columns} 
-          getRowId={(row) => row.id}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
+      <DataGrid 
+        rows={invoices} 
+        columns={columns} 
+        getRowId={(row) => row.id}
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 10,
             },
-          }}
-          pageSizeOptions={[10, 20, 50, 100]}
-          />
-      </div>
+          },
+        }}
+        pageSizeOptions={[10, 20, 50, 100]}
+        autoHeight
+      />
     </Paper>
   );
 };

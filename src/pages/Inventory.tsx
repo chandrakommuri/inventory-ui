@@ -22,15 +22,15 @@ const Inventory: React.FC = () => {
   );
 
   const columns: GridColDef[] = [
-    { field: 'code', headerName: 'Product Code', width: 150 },
-    { field: 'description', headerName: 'Product Description', width: 600 },
-    { field: 'inwardQuantity', headerName: 'Inward Qty', width: 100, align: 'center' },
-    { field: 'outwardQuantity', headerName: 'Outward Qty', width: 100, align: 'center' },
-    { field: 'quantity', headerName: 'Physical Qty', width: 100, align: 'center' },
+    { field: 'code', headerName: 'Product Code', headerAlign: 'center', align: 'center', flex: 1 },
+    { field: 'description', headerName: 'Product Description', headerAlign: 'center', flex: 3 },
+    { field: 'inwardQuantity', headerName: 'Inward Qty', headerAlign: 'center', align: 'center', flex: 1 },
+    { field: 'outwardQuantity', headerName: 'Outward Qty', headerAlign: 'center', align: 'center', flex: 1 },
+    { field: 'quantity', headerName: 'Physical Qty', headerAlign: 'center', align: 'center', flex: 1 },
   ];
 
   return (
-    <Paper elevation={3} style={{ padding: '20px' }}>
+    <Paper elevation={3} sx={{ padding: '20px', transition: 'height 0.3s ease' }}>
       <TextField
         label="Search"
         variant="outlined"
@@ -38,18 +38,23 @@ const Inventory: React.FC = () => {
         style={{ marginBottom: '20px' }}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-      />
-      <div style={{ height: 400, width: '100%' }}>
-        <DataGrid rows={filteredProducts} 
-            columns={columns} 
-            initialState={{
-                pagination: {
-                    paginationModel: { pageSize: 5, page: 0 },
-                },
-            }}
-            pageSizeOptions={[5, 10, 20]} 
-            getRowId={(row) => row.id} />
-      </div>
+      />      
+      <DataGrid rows={filteredProducts} 
+        columns={columns} 
+        initialState={{
+            pagination: {
+                paginationModel: { pageSize: 5, page: 0 },
+            },
+        }}
+        pageSizeOptions={[5, 10, 20]} 
+        getRowId={(row) => row.id}
+        sx = {{
+          '.MuiDataGrid-columnHeader': {
+            backgroundColor: '#61dafb',
+          }
+        }}
+        autoHeight
+      />      
     </Paper>
   );
 };
