@@ -23,8 +23,10 @@ const Inventory: React.FC = () => {
 
   const columns: GridColDef[] = [
     { field: 'code', headerName: 'Product Code', width: 150 },
-    { field: 'description', headerName: 'Product Description', width: 500 },
-    { field: 'quantity', headerName: 'Quantity', width: 100, align: 'center' },
+    { field: 'description', headerName: 'Product Description', width: 600 },
+    { field: 'inwardQuantity', headerName: 'Inward Qty', width: 100, align: 'center' },
+    { field: 'outwardQuantity', headerName: 'Outward Qty', width: 100, align: 'center' },
+    { field: 'quantity', headerName: 'Physical Qty', width: 100, align: 'center' },
   ];
 
   return (
