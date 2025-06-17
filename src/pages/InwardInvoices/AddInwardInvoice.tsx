@@ -281,6 +281,9 @@ const AddInwardInvoice: React.FC = () => {
                           // @ts-ignore
                           errors.items?.[index]?.quantity
                         }
+                        inputProps={{
+                          onWheel: (e) => (e.target as HTMLInputElement).blur(),
+                        }}
                       />
                       <TextField
                         name={`items[${index}].imeis`}

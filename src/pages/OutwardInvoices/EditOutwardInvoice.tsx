@@ -135,10 +135,36 @@ const EditOutwardInvoice: React.FC = () => {
           .min(1, 'Quantity must be at least 1'),
         imeis: Yup.string()
           .required('IMEIs are required')
+          .test('imeis-contents', 'IMEI should value should be numeric', function (value, context) {
+            const numberRegex = /^\d+$/;
+            const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
+            return imeis.every(imei => numberRegex.test(imei));
+          })
+          .test('imeis-length', 'Length of each IMEI must be 15', function (value, context) {
+            const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
+            return imeis.every(imei => imei.length === 15);
+          })
+          .test('imeis-duplicates', 'Duplicate IMEIs found', function (value, context) {
+            const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
+            const quantity = context.parent.quantity;
+            return imeis.length === new Set(imeis).size;
+          })
           .test('imeis-match-quantity', 'Number of IMEIs must match the quantity', function (value, context) {
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
             const quantity = context.parent.quantity;
             return imeis.length === quantity;
+          })
+          .test('imeis-match-product', 'IMEIs should match the product', function (value, context) {
+            const imeis = value
+              ? value.split('\n').map(s => s.trim()).filter(Boolean)
+              : [];
+
+            const productId = parseInt(context.parent.productId);
+            const product = products.find(p => p.id === productId);
+            if (!product || !product.imeis) return false;
+            const validImeis = new Set(product.imeis);
+            
+            return imeis.every(i => validImeis.has(i));
           }),
       })
     ),
@@ -367,6 +393,9 @@ const EditOutwardInvoice: React.FC = () => {
                           // @ts-ignore
                           errors.items?.[index]?.quantity
                         }
+                        inputProps={{
+                          onWheel: (e) => (e.target as HTMLInputElement).blur(),
+                        }}
                       />
                       <TextField
                         name={`items[${index}].imeis`}

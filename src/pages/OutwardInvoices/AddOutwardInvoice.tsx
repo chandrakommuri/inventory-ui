@@ -141,6 +141,18 @@ const AddOutwardInvoice: React.FC = () => {
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
             const quantity = context.parent.quantity;
             return imeis.length === quantity;
+          })
+          .test('imeis-match-product', 'IMEIs should match the product', function (value, context) {
+            const imeis = value
+              ? value.split('\n').map(s => s.trim()).filter(Boolean)
+              : [];
+
+            const productId = parseInt(context.parent.productId);
+            const product = products.find(p => p.id === productId);
+            if (!product || !product.imeis) return false;
+            const validImeis = new Set(product.imeis);
+
+            return imeis.every(i => validImeis.has(i));
           }),
       })
     ),
@@ -349,6 +361,9 @@ const AddOutwardInvoice: React.FC = () => {
                           // @ts-ignore
                           errors.items?.[index]?.quantity
                         }
+                        inputProps={{
+                          onWheel: (e) => (e.target as HTMLInputElement).blur(),
+                        }}
                       />
                       <TextField
                         name={`items[${index}].imeis`}
