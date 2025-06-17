@@ -1,6 +1,7 @@
 export interface InvoiceItem {
     productId: number;
     code: string;
+    description: string;
     quantity: number;
     imeis: string[];
   }
