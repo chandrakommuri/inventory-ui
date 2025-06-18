@@ -18,7 +18,8 @@ const Inventory: React.FC = () => {
   }, []);
 
   const filteredProducts = products.filter((product) =>
-    product.description.toLowerCase().includes(search.toLowerCase())
+    product.code.toLowerCase().includes(search.toLowerCase()) || 
+      product.description.toLowerCase().includes(search.toLowerCase())
   );
 
   const columns: GridColDef[] = [
@@ -43,10 +44,10 @@ const Inventory: React.FC = () => {
         columns={columns} 
         initialState={{
             pagination: {
-                paginationModel: { pageSize: 5, page: 0 },
+                paginationModel: { pageSize: 20, page: 0 },
             },
         }}
-        pageSizeOptions={[5, 10, 20]} 
+        pageSizeOptions={[20, 50, 100, 200]} 
         getRowId={(row) => row.id}
         sx = {{
           '.MuiDataGrid-columnHeader': {
