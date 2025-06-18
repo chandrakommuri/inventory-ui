@@ -49,11 +49,6 @@ const Inventory: React.FC = () => {
         }}
         pageSizeOptions={[20, 50, 100, 200]} 
         getRowId={(row) => row.id}
-        sx = {{
-          '.MuiDataGrid-columnHeader': {
-            backgroundColor: '#61dafb',
-          }
-        }}
         autoHeight
       />      
     </Paper>

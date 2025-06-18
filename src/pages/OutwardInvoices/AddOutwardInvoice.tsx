@@ -12,6 +12,7 @@ import { CREATE_OUTWARD_INVOICE_URL, GET_ALL_CUSTOMERS_URL, GET_ALL_DESTINATIONS
 import { Transporter } from '../../models/Transporter';
 import { Customer } from '../../models/Customer';
 import { Destination } from '../../models/Destination';
+import DateFieldWithClick from '../../components/DateFieldWithClick';
 
 const AddOutwardInvoice: React.FC = () => {
   const navigate = useNavigate();
@@ -197,10 +198,9 @@ const AddOutwardInvoice: React.FC = () => {
               error={touched.invoiceNumber && Boolean(errors.invoiceNumber)}
               helperText={touched.invoiceNumber && errors.invoiceNumber}
             />
-            <TextField
+            <DateFieldWithClick
               name="invoiceDate"
               label="Invoice Date"
-              type="date"
               fullWidth
               margin="normal"
               onChange={handleChange}

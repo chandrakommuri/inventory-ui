@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_URL, GET_INWARD_INVOICE_URL, UPDATE_INWARD_INVOICE_URL } from '../../Config';
 import { Product } from '../../models/Product';
 import { Transporter } from '../../models/Transporter';
+import DateFieldWithClick from '../../components/DateFieldWithClick';
 
 const EditInwardInvoice: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -200,10 +201,9 @@ const EditInwardInvoice: React.FC = () => {
               value={values.invoiceNumber}
               disabled // Invoice Number cannot be edited
             />
-            <TextField
+            <DateFieldWithClick
               name="invoiceDate"
               label="Invoice Date"
-              type="date"
               fullWidth
               margin="normal"
               onChange={handleChange}
@@ -213,10 +213,9 @@ const EditInwardInvoice: React.FC = () => {
               error={touched.invoiceDate && Boolean(errors.invoiceDate)}
               helperText={touched.invoiceDate && errors.invoiceDate}
             />
-            <TextField
+            <DateFieldWithClick
               name="deliveryDate"
               label="Delivery Date"
-              type="date"
               fullWidth
               margin="normal"
               onChange={handleChange}

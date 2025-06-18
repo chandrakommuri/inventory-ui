@@ -12,6 +12,7 @@ import { Product } from '../../models/Product';
 import { Customer } from '../../models/Customer';
 import { Destination } from '../../models/Destination';
 import { Transporter } from '../../models/Transporter';
+import DateFieldWithClick from '../../components/DateFieldWithClick';
 
 const EditOutwardInvoice: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -163,8 +164,12 @@ const EditOutwardInvoice: React.FC = () => {
             const product = products.find(p => p.id === productId);
             if (!product || !product.imeis) return false;
             const validImeis = new Set(product.imeis);
+
+            const existingItem = initialValues?.items.find(item => item.productId === productId);
+            // @ts-ignore
+            const existingImeis = new Set(existingItem?(existingItem.imeis as string).split("\n"):[]);
             
-            return imeis.every(i => validImeis.has(i));
+            return imeis.every(i => validImeis.has(i) || existingImeis.has(i));
           }),
       })
     ),
@@ -224,10 +229,9 @@ const EditOutwardInvoice: React.FC = () => {
               value={values.invoiceNumber}
               disabled
             />
-            <TextField
+            <DateFieldWithClick
               name="invoiceDate"
               label="Invoice Date"
-              type="date"
               fullWidth
               margin="normal"
               onChange={handleChange}
