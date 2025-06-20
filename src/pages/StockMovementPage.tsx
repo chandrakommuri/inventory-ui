@@ -50,9 +50,12 @@ const StockMovementPage: React.FC = () => {
       const start = values.startDate?.format('YYYY-MM-DD');
       const end = values.endDate?.format('YYYY-MM-DD');
       try {
-        const res = await axios.get(STOCK_MOVEMENT_URL, {
+        const res = await axios.get<StockRow[]>(STOCK_MOVEMENT_URL, {
           params: { startDate: start, endDate: end }
         });
+        const data = res.data;
+        let sno = 1;
+        data.forEach(d => d.sno = sno++);
         setData(res.data);
         if (res.data.length > 0) {
           const keys = Object.keys(res.data[0]);
@@ -69,11 +72,11 @@ const StockMovementPage: React.FC = () => {
   });
 
   const exportToExcel = () => {
-    const headersRow1 = ['Product Code', 'Product Description', ...dates.flatMap(date => [date, ''])];
-    const headersRow2 = ['', '', ...dates.flatMap(() => ['IN', 'OUT'])];
+    const headersRow1 = ['S. No', 'Product Code', 'Product Description', ...dates.flatMap(date => [date, ''])];
+    const headersRow2 = ['', '', '', ...dates.flatMap(() => ['IN', 'OUT'])];
 
     const rows = data.map(row => {
-      const base = [row.productCode, row.productDescription];
+      const base = [row.sno, row.productCode, row.productDescription];
       const values = dates.flatMap(date => [
         row[`${date}_IN`] || 0,
         row[`${date}_OUT`] || 0
@@ -106,16 +109,22 @@ const StockMovementPage: React.FC = () => {
 
   const baseColumns = [
     {
+      title: 'S. No',
+      dataIndex: 'sno',
+      key: 'sno',
+      align: 'center' as const,
+    },
+    {
       title: 'Product Code',
       dataIndex: 'productCode',
       key: 'productCode',
-      fixed: 'left' as const
+      align: 'center' as const
     },
     {
       title: 'Product Description',
       dataIndex: 'productDescription',
       key: 'productDescription',
-      fixed: 'left' as const
+      align: 'center' as const
     }
   ];
 
@@ -126,7 +135,7 @@ const StockMovementPage: React.FC = () => {
         title: 'IN',
         dataIndex: `${date}_IN`,
         key: `${date}_IN`,
-        align: 'center'
+        align: 'center',
       },
       {
         title: 'OUT',

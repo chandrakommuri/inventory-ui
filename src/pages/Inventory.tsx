@@ -12,7 +12,10 @@ const Inventory: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await axios.get<Product[]>(GET_ALL_PRODUCTS_URL);
-      setProducts(response.data);
+      const data = response.data;
+      let sno = 1;
+      data.forEach(p => p.sno = sno++);
+      setProducts(data);
     };
     fetchProducts();
   }, []);
@@ -23,6 +26,7 @@ const Inventory: React.FC = () => {
   );
 
   const columns: GridColDef[] = [
+    { field: 'sno', headerName: 'S. No', headerAlign: 'center', align: 'center', width: 70 },
     { field: 'code', headerName: 'Product Code', headerAlign: 'center', align: 'center', flex: 1 },
     { field: 'description', headerName: 'Product Description', headerAlign: 'center', flex: 3 },
     { field: 'inwardQuantity', headerName: 'Inward Qty', headerAlign: 'center', align: 'center', flex: 1 },
@@ -47,7 +51,7 @@ const Inventory: React.FC = () => {
                 paginationModel: { pageSize: 20, page: 0 },
             },
         }}
-        pageSizeOptions={[20, 50, 100, 200]} 
+        pageSizeOptions={[20, 50, 100]} 
         getRowId={(row) => row.id}
         autoHeight
       />      

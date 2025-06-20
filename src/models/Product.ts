@@ -1,4 +1,5 @@
 export interface Product {
+    sno: number;
     id: number;
     code: string;
     description: string;

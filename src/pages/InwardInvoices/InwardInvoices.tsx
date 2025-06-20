@@ -19,7 +19,10 @@ const InwardInvoices: React.FC = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       const response = await axios.get<InwardInvoice[]>(GET_ALL_INWARD_INVOICES_URL);
-      setInvoices(response.data);
+      const data = response.data;
+      let sno = 1;
+      data.forEach(i => i.sno = sno++);
+      setInvoices(data);
     };
     fetchInvoices();
   }, []);
@@ -56,6 +59,7 @@ const InwardInvoices: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
+    { field: 'sno', headerName: 'S. No', width: 70},
     { field: 'invoiceNumber', headerName: 'Invoice Number', flex: 1 },
     { field: 'invoiceDate', headerName: 'Invoice Date', flex: 1 },
     { field: 'deliveryDate', headerName: 'Delivery Date', flex: 1 },

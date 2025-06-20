@@ -19,7 +19,10 @@ const OutwardInvoices: React.FC = () => {
     const fetchInvoices = async () => {
       try {
         const response = await axios.get<OutwardInvoice[]>(GET_ALL_OUTWARD_INVOICES_URL);
-        setInvoices(response.data);
+        const data = response.data;
+        let sno = 1;
+        data.forEach(i => i.sno = sno++);
+        setInvoices(data);
       } catch (error) {
         console.error('Error fetching outward invoices:', error);
       }
@@ -63,12 +66,13 @@ const OutwardInvoices: React.FC = () => {
     };
   
     const columns: GridColDef[] = [
-    { field: 'invoiceNumber', headerName: 'Invoice Number', width: 150, flex: 1 },
-    { field: 'invoiceDate', headerName: 'Invoice Date', width: 150, flex: 1 },
-    { field: 'customer', headerName: 'Customer Name', width: 200, flex: 1 },
-    { field: 'destination', headerName: 'Destination', width: 200, flex: 1 },
-    { field: 'transporter', headerName: 'Transporter', width: 200, flex: 1 },
-    { field: 'docketNumber', headerName: 'Docket Number', width: 150, flex: 1 },
+    { field: 'sno', headerName: 'S. No', width: 70},
+    { field: 'invoiceNumber', headerName: 'Invoice Number', flex: 1 },
+    { field: 'invoiceDate', headerName: 'Invoice Date', flex: 1 },
+    { field: 'customer', headerName: 'Customer Name', flex: 1 },
+    { field: 'destination', headerName: 'Destination', flex: 1 },
+    { field: 'transporter', headerName: 'Transporter', flex: 1 },
+    { field: 'docketNumber', headerName: 'Docket Number', flex: 1 },
     {
       field: 'actions',
       headerName: 'Actions',

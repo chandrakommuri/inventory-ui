@@ -7,6 +7,7 @@ export interface InvoiceItem {
   }
   
 export interface InwardInvoice {
+    sno: number;
     id: number;
     invoiceNumber: string;
     invoiceDate: string; // ISO date string
