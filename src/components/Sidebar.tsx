@@ -98,7 +98,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h5" noWrap>
-            Sri 4 Way Express Invantory Management
+            Sri 4 Way Express Inventory Management
           </Typography>
         </Toolbar>
       </AppBar>

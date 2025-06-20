@@ -11,13 +11,13 @@ import {
   CircularProgress,
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import axios from 'axios';
 import { InwardInvoice } from '../../models/InwardInvoice';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_URL, GET_INWARD_INVOICE_URL, UPDATE_INWARD_INVOICE_URL } from '../../Config';
 import { Product } from '../../models/Product';
 import { Transporter } from '../../models/Transporter';
 import DateFieldWithClick from '../../components/DateFieldWithClick';
+import api from '../../Api';
 
 const EditInwardInvoice: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +35,7 @@ const EditInwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get<Product[]>(GET_ALL_PRODUCTS_URL);
+        const response = await api.get<Product[]>(GET_ALL_PRODUCTS_URL);
         setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -54,7 +54,7 @@ const EditInwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchTransporters = async () => {
       try {
-        const response = await axios.get<Transporter[]>(GET_ALL_TRANSPORTERS_URL);
+        const response = await api.get<Transporter[]>(GET_ALL_TRANSPORTERS_URL);
         setTransporters(response.data);
       } catch (error) {
         console.error('Error fetching transporters:', error);
@@ -69,7 +69,7 @@ const EditInwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
-        const response = await axios.get<InwardInvoice>(
+        const response = await api.get<InwardInvoice>(
           `${GET_INWARD_INVOICE_URL}${id}`
         );
         const invoice = response.data;
@@ -154,7 +154,7 @@ const EditInwardInvoice: React.FC = () => {
     };
 
     try {
-      await axios.put(`${UPDATE_INWARD_INVOICE_URL}${id}`, formattedValues, {
+      await api.put(`${UPDATE_INWARD_INVOICE_URL}${id}`, formattedValues, {
         headers: {
           'Content-Type': 'application/json',
         },

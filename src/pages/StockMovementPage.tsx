@@ -8,12 +8,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import dayjs, { Dayjs } from 'dayjs';
-import axios from 'axios';
 import { Table } from 'antd';
 import * as XLSX from 'xlsx';
 import 'antd/dist/reset.css'; // Reset AntD styles
 import { STOCK_MOVEMENT_URL } from '../Config';
 import DownloadIcon from '@mui/icons-material/Download';
+import api from '../Api';
 
 type StockRow = Record<string, string | number>;
 
@@ -50,7 +50,7 @@ const StockMovementPage: React.FC = () => {
       const start = values.startDate?.format('YYYY-MM-DD');
       const end = values.endDate?.format('YYYY-MM-DD');
       try {
-        const res = await axios.get<StockRow[]>(STOCK_MOVEMENT_URL, {
+        const res = await api.get<StockRow[]>(STOCK_MOVEMENT_URL, {
           params: { startDate: start, endDate: end }
         });
         const data = res.data;

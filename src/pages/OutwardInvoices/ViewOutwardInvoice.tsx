@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Paper,
@@ -19,6 +18,7 @@ import {
 } from '@mui/material';
 import { OutwardInvoice } from '../../models/OutwardInvoice';
 import { GET_OUTWARD_INVOICE_URL } from '../../Config';
+import api from '../../Api';
 
 const ViewOutwardInvoice: React.FC = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const ViewOutwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
-        const response = await axios.get<OutwardInvoice>(
+        const response = await api.get<OutwardInvoice>(
           `${GET_OUTWARD_INVOICE_URL}${id}`
         );
         setInvoice(response.data);

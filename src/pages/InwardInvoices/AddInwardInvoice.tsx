@@ -3,7 +3,6 @@ import { Formik, Form, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import { Button, Paper, TextField, Box, Typography, CircularProgress } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../../models/Product';
 import AddIcon from '@mui/icons-material/Add';
@@ -11,6 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { CREATE_INWARD_INVOICE_URL, GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_URL } from '../../Config';
 import { Transporter } from '../../models/Transporter';
 import DateFieldWithClick from '../../components/DateFieldWithClick';
+import api from '../../Api';
 
 const AddInwardInvoice: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const AddInwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get<Product[]>(GET_ALL_PRODUCTS_URL);
+        const response = await api.get<Product[]>(GET_ALL_PRODUCTS_URL);
         setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -42,7 +42,7 @@ const AddInwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchTransporters = async () => {
       try {
-        const response = await axios.get<Transporter[]>(GET_ALL_TRANSPORTERS_URL);
+        const response = await api.get<Transporter[]>(GET_ALL_TRANSPORTERS_URL);
         setTransporters(response.data);
       } catch (error) {
         console.error('Error fetching transporters:', error);
@@ -123,7 +123,7 @@ const AddInwardInvoice: React.FC = () => {
     };
 
     try {
-      await axios.post(CREATE_INWARD_INVOICE_URL, formattedValues, {
+      await api.post(CREATE_INWARD_INVOICE_URL, formattedValues, {
         headers: {
           'Content-Type': 'application/json',
         },

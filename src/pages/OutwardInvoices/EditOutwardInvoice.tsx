@@ -4,7 +4,6 @@ import * as Yup from 'yup';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Paper, TextField, Button, Box, Typography, CircularProgress } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import axios from 'axios';
 import { OutwardInvoice } from '../../models/OutwardInvoice';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { GET_ALL_CUSTOMERS_URL, GET_ALL_DESTINATIONS_URL, GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_URL, GET_OUTWARD_INVOICE_URL, UPDATE_OUTWARD_INVOICE_URL } from '../../Config';
@@ -13,6 +12,7 @@ import { Customer } from '../../models/Customer';
 import { Destination } from '../../models/Destination';
 import { Transporter } from '../../models/Transporter';
 import DateFieldWithClick from '../../components/DateFieldWithClick';
+import api from '../../Api';
 
 const EditOutwardInvoice: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +26,7 @@ const EditOutwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get<Product[]>(GET_ALL_PRODUCTS_URL);
+        const response = await api.get<Product[]>(GET_ALL_PRODUCTS_URL);
         setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -45,7 +45,7 @@ const EditOutwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const response = await axios.get<Customer[]>(GET_ALL_CUSTOMERS_URL);
+        const response = await api.get<Customer[]>(GET_ALL_CUSTOMERS_URL);
         setCustomer(response.data);
       } catch (error) {
         console.error('Error fetching customers:', error);
@@ -64,7 +64,7 @@ const EditOutwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchDestination = async () => {
       try {
-        const response = await axios.get<Destination[]>(GET_ALL_DESTINATIONS_URL);
+        const response = await api.get<Destination[]>(GET_ALL_DESTINATIONS_URL);
         setDestination(response.data);
       } catch (error) {
         console.error('Error fetching destinations:', error);
@@ -83,7 +83,7 @@ const EditOutwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchTransporters = async () => {
       try {
-        const response = await axios.get<Transporter[]>(GET_ALL_TRANSPORTERS_URL);
+        const response = await api.get<Transporter[]>(GET_ALL_TRANSPORTERS_URL);
         setTransporters(response.data);
       } catch (error) {
         console.error('Error fetching transporters:', error);
@@ -97,7 +97,7 @@ const EditOutwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
-        const response = await axios.get<OutwardInvoice>(
+        const response = await api.get<OutwardInvoice>(
           `${GET_OUTWARD_INVOICE_URL}${id}`
         );
         const invoice = response.data;
@@ -185,7 +185,7 @@ const EditOutwardInvoice: React.FC = () => {
     };
 
     try {
-      await axios.put(`${UPDATE_OUTWARD_INVOICE_URL}${id}`, formattedValues, {
+      await api.put(`${UPDATE_OUTWARD_INVOICE_URL}${id}`, formattedValues, {
         headers: {
           'Content-Type': 'application/json',
         },

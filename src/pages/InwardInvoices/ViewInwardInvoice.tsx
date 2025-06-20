@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Paper,
@@ -19,6 +18,7 @@ import {
 } from '@mui/material';
 import { InwardInvoice } from '../../models/InwardInvoice';
 import { GET_INWARD_INVOICE_URL } from '../../Config';
+import api from '../../Api';
 
 const ViewInwardInvoice: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Extract route parameter
@@ -31,7 +31,7 @@ const ViewInwardInvoice: React.FC = () => {
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
-        const response = await axios.get<InwardInvoice>(
+        const response = await api.get<InwardInvoice>(
           `${GET_INWARD_INVOICE_URL}${id}`
         );
         setInvoice(response.data);

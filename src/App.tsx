@@ -2,7 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+
+import LoginPage from './pages/LoginPage';
 import Home from './pages/Home';
+
 import Inventory from './pages/Inventory';
 
 import InwardInvoices from './pages/InwardInvoices/InwardInvoices';
@@ -15,6 +18,7 @@ import AddOutwardInvoice from './pages/OutwardInvoices/AddOutwardInvoice';
 import EditOutwardInvoice from './pages/OutwardInvoices/EditOutwardInvoice';
 import ViewOutwardInvoice from './pages/OutwardInvoices/ViewOutwardInvoice';
 import StockMovementPage from './pages/StockMovementPage';
+import PrivateRoute from './PrivateRoute';
 
 const App: React.FC = () => {
   return (
@@ -23,18 +27,20 @@ const App: React.FC = () => {
       <Sidebar>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/inward-invoices" element={<InwardInvoices />} />
-          <Route path="/inward-invoices/add" element={<AddInwardInvoice />} />
-          <Route path="/inward-invoices/view/:id" element={<ViewInwardInvoice />} />
-          <Route path="/inward-invoices/edit/:id" element={<EditInwardInvoice />} />
+          <Route path="/login" element={<LoginPage />} />
+          
+          <Route path="/inventory" element={<PrivateRoute><Inventory /></PrivateRoute>} />
+          <Route path="/inward-invoices" element={<PrivateRoute><InwardInvoices /></PrivateRoute>} />
+          <Route path="/inward-invoices/add" element={<PrivateRoute><AddInwardInvoice /></PrivateRoute>} />
+          <Route path="/inward-invoices/view/:id" element={<PrivateRoute><ViewInwardInvoice /></PrivateRoute>} />
+          <Route path="/inward-invoices/edit/:id" element={<PrivateRoute><EditInwardInvoice /></PrivateRoute>} />
 
-          <Route path="/outward-invoices" element={<OutwardInvoices />} />
-          <Route path="/outward-invoices/add" element={<AddOutwardInvoice />} />
-          <Route path="/outward-invoices/view/:id" element={<ViewOutwardInvoice />} />
-          <Route path="/outward-invoices/edit/:id" element={<EditOutwardInvoice />} />
+          <Route path="/outward-invoices" element={<PrivateRoute><OutwardInvoices /></PrivateRoute>} />
+          <Route path="/outward-invoices/add" element={<PrivateRoute><AddOutwardInvoice /></PrivateRoute>} />
+          <Route path="/outward-invoices/view/:id" element={<PrivateRoute><ViewOutwardInvoice /></PrivateRoute>} />
+          <Route path="/outward-invoices/edit/:id" element={<PrivateRoute><EditOutwardInvoice /></PrivateRoute>} />
 
-          <Route path="/stock-movement" element={<StockMovementPage />} />
+          <Route path="/stock-movement" element={<PrivateRoute><StockMovementPage /></PrivateRoute>} />
         </Routes>
       </Sidebar>
     </Router>

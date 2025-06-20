@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Button, Paper, IconButton, Box, ThemeProvider } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +10,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { InwardInvoice } from '../../models/InwardInvoice';
 import { dark } from '@mui/material/styles/createPalette';
 import { DELETE_INWARD_INVOICE_URL, DOWNLOAD_INVOICE_REPORT_URL, GET_ALL_INWARD_INVOICES_URL } from '../../Config';
+import api from '../../Api';
 
 const InwardInvoices: React.FC = () => {
   const [invoices, setInvoices] = useState<InwardInvoice[]>([]);
@@ -18,7 +18,7 @@ const InwardInvoices: React.FC = () => {
 
   useEffect(() => {
     const fetchInvoices = async () => {
-      const response = await axios.get<InwardInvoice[]>(GET_ALL_INWARD_INVOICES_URL);
+      const response = await api.get<InwardInvoice[]>(GET_ALL_INWARD_INVOICES_URL);
       const data = response.data;
       let sno = 1;
       data.forEach(i => i.sno = sno++);
@@ -29,32 +29,33 @@ const InwardInvoices: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
-      await axios.delete(`${DELETE_INWARD_INVOICE_URL}${id}`);
+      await api.delete(`${DELETE_INWARD_INVOICE_URL}${id}`);
       setInvoices(invoices.filter((invoice) => invoice.id !== id));
     }
   };
 
   const handleDownloadReport = async () => {
     const today = new Date().toISOString().split('T')[0];
-    const url = new URL(DOWNLOAD_INVOICE_REPORT_URL);
-    url.searchParams.append("type", "inward");
-    url.searchParams.append("startDate", today);
-    url.searchParams.append("endDate", today);
 
     try {
-      const response = await fetch(url.toString());
-      console.log(url.toString());
-      if (!response.ok) throw new Error("Failed to download");
+      const response = await api.get(DOWNLOAD_INVOICE_REPORT_URL, {
+        params: {
+          type: 'inward',
+          startDate: today,
+          endDate: today
+        },
+        responseType: 'blob',
+      });
 
-      const blob = await response.blob();
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
+      const blob = new Blob([response.data], { type: response.headers['content-type'] });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
       link.download = `inward_invoice_report_${today}.xlsx`;
       link.click();
       link.remove();
     } catch (error) {
-      console.error("Download failed:", error);
-      alert("Unable to download report.");
+      console.error('Download failed:', error);
+      alert('Unable to download report.');
     }
   };
 

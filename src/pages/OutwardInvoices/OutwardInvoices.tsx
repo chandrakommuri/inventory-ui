@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Button, Paper, Box, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DownloadIcon from '@mui/icons-material/Download';
 import { OutwardInvoice } from '../../models/OutwardInvoice';
 import { DELETE_OUTWARD_INVOICE_URL, DOWNLOAD_INVOICE_REPORT_URL, GET_ALL_OUTWARD_INVOICES_URL } from '../../Config';
+import api from '../../Api';
 
 const OutwardInvoices: React.FC = () => {
   const [invoices, setInvoices] = useState<OutwardInvoice[]>([]);
@@ -18,7 +18,7 @@ const OutwardInvoices: React.FC = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const response = await axios.get<OutwardInvoice[]>(GET_ALL_OUTWARD_INVOICES_URL);
+        const response = await api.get<OutwardInvoice[]>(GET_ALL_OUTWARD_INVOICES_URL);
         const data = response.data;
         let sno = 1;
         data.forEach(i => i.sno = sno++);
@@ -33,7 +33,7 @@ const OutwardInvoices: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       try {
-        await axios.delete(`${DELETE_OUTWARD_INVOICE_URL}${id}`);
+        await api.delete(`${DELETE_OUTWARD_INVOICE_URL}${id}`);
         setInvoices(invoices.filter((invoice) => invoice.id !== id));
       } catch (error) {
         console.error('Error deleting invoice:', error);
@@ -42,28 +42,29 @@ const OutwardInvoices: React.FC = () => {
   };
 
   const handleDownloadReport = async () => {
-      const today = new Date().toISOString().split('T')[0];
-      const url = new URL(DOWNLOAD_INVOICE_REPORT_URL);
-      url.searchParams.append("type", "outward");
-      url.searchParams.append("startDate", today);
-      url.searchParams.append("endDate", today);
-  
-      try {
-        const response = await fetch(url.toString());
-        console.log(url.toString());
-        if (!response.ok) throw new Error("Failed to download");
-  
-        const blob = await response.blob();
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `outward_invoice_report_${today}.xlsx`;
-        link.click();
-        link.remove();
-      } catch (error) {
-        console.error("Download failed:", error);
-        alert("Unable to download report.");
-      }
-    };
+    const today = new Date().toISOString().split('T')[0];
+
+    try {
+      const response = await api.get(DOWNLOAD_INVOICE_REPORT_URL, {
+        params: {
+          type: 'outward',
+          startDate: today,
+          endDate: today
+        },
+        responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data], { type: response.headers['content-type'] });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `outward_invoice_report_${today}.xlsx`;
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Unable to download report.');
+    }
+  };
   
     const columns: GridColDef[] = [
     { field: 'sno', headerName: 'S. No', width: 70},
