@@ -7,9 +7,10 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import DownloadIcon from '@mui/icons-material/Download';
 import { InwardInvoice } from '../../models/InwardInvoice';
 import { dark } from '@mui/material/styles/createPalette';
-import { DELETE_INWARD_INVOICE_URL, GET_ALL_INWARD_INVOICES_URL } from '../../Config';
+import { DELETE_INWARD_INVOICE_URL, DOWNLOAD_INVOICE_REPORT_URL, GET_ALL_INWARD_INVOICES_URL } from '../../Config';
 
 const InwardInvoices: React.FC = () => {
   const [invoices, setInvoices] = useState<InwardInvoice[]>([]);
@@ -27,6 +28,30 @@ const InwardInvoices: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       await axios.delete(`${DELETE_INWARD_INVOICE_URL}${id}`);
       setInvoices(invoices.filter((invoice) => invoice.id !== id));
+    }
+  };
+
+  const handleDownloadReport = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const url = new URL(DOWNLOAD_INVOICE_REPORT_URL);
+    url.searchParams.append("type", "inward");
+    url.searchParams.append("startDate", today);
+    url.searchParams.append("endDate", today);
+
+    try {
+      const response = await fetch(url.toString());
+      console.log(url.toString());
+      if (!response.ok) throw new Error("Failed to download");
+
+      const blob = await response.blob();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `inward_invoice_report_${today}.xlsx`;
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert("Unable to download report.");
     }
   };
 
@@ -60,9 +85,24 @@ const InwardInvoices: React.FC = () => {
     <Paper elevation={3} sx={{ padding: '20px', transition: 'height 0.3s ease' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="20px">
         <h2>Inward Invoices</h2>
-        <Button variant="contained" color="primary" onClick={() => navigate('/inward-invoices/add')} startIcon={<AddIcon />}>
-          Add Invoice
-        </Button>
+        <Box display="flex" gap={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate('/inward-invoices/add')}
+            startIcon={<AddIcon />}
+          >
+            Add Invoice
+          </Button>
+          <Button 
+            variant="outlined" 
+            color="success" 
+            onClick={handleDownloadReport}
+            endIcon={<DownloadIcon />}
+          >
+            Today’s Report
+          </Button>
+        </Box>
       </Box>
       <DataGrid
         rows={invoices}

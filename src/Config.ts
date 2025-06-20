@@ -33,4 +33,8 @@ export const GET_OUTWARD_INVOICE_URL = `${OUTWARD_INVOICES_URL}/`;
 export const UPDATE_OUTWARD_INVOICE_URL = `${OUTWARD_INVOICES_URL}/`;
 export const DELETE_OUTWARD_INVOICE_URL = `${OUTWARD_INVOICES_URL}/`;
 
+// Stock Movement URLs
 export const STOCK_MOVEMENT_URL = `${API_URL}/stock-movement`;
+
+// Report URLs
+export const DOWNLOAD_INVOICE_REPORT_URL = `${API_URL}/invoice-report`;

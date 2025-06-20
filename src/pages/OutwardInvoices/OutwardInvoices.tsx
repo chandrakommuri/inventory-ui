@@ -7,8 +7,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import DownloadIcon from '@mui/icons-material/Download';
 import { OutwardInvoice } from '../../models/OutwardInvoice';
-import { DELETE_OUTWARD_INVOICE_URL, GET_ALL_OUTWARD_INVOICES_URL } from '../../Config';
+import { DELETE_OUTWARD_INVOICE_URL, DOWNLOAD_INVOICE_REPORT_URL, GET_ALL_OUTWARD_INVOICES_URL } from '../../Config';
 
 const OutwardInvoices: React.FC = () => {
   const [invoices, setInvoices] = useState<OutwardInvoice[]>([]);
@@ -37,7 +38,31 @@ const OutwardInvoices: React.FC = () => {
     }
   };
 
-  const columns: GridColDef[] = [
+  const handleDownloadReport = async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const url = new URL(DOWNLOAD_INVOICE_REPORT_URL);
+      url.searchParams.append("type", "outward");
+      url.searchParams.append("startDate", today);
+      url.searchParams.append("endDate", today);
+  
+      try {
+        const response = await fetch(url.toString());
+        console.log(url.toString());
+        if (!response.ok) throw new Error("Failed to download");
+  
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `outward_invoice_report_${today}.xlsx`;
+        link.click();
+        link.remove();
+      } catch (error) {
+        console.error("Download failed:", error);
+        alert("Unable to download report.");
+      }
+    };
+  
+    const columns: GridColDef[] = [
     { field: 'invoiceNumber', headerName: 'Invoice Number', width: 150, flex: 1 },
     { field: 'invoiceDate', headerName: 'Invoice Date', width: 150, flex: 1 },
     { field: 'customer', headerName: 'Customer Name', width: 200, flex: 1 },
@@ -68,9 +93,24 @@ const OutwardInvoices: React.FC = () => {
     <Paper elevation={3} sx={{ padding: '20px', transition: 'height 0.3s ease' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="20px">
         <h2>Outward Invoices</h2>
-        <Button variant="contained" color="primary" onClick={() => navigate('/outward-invoices/add')} startIcon={<AddIcon />}>
-          Add Invoice
-        </Button>
+        <Box display="flex" gap={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate('/outward-invoices/add')}
+            startIcon={<AddIcon />}
+          >
+            Add Invoice
+          </Button>
+          <Button 
+            variant="outlined" 
+            color="success" 
+            onClick={handleDownloadReport}
+            endIcon={<DownloadIcon />}
+          >
+            Today’s Report
+          </Button>
+        </Box>
       </Box>
       <DataGrid 
         rows={invoices} 

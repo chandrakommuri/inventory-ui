@@ -13,6 +13,7 @@ import { Table } from 'antd';
 import * as XLSX from 'xlsx';
 import 'antd/dist/reset.css'; // Reset AntD styles
 import { STOCK_MOVEMENT_URL } from '../Config';
+import DownloadIcon from '@mui/icons-material/Download';
 
 type StockRow = Record<string, string | number>;
 
@@ -83,10 +84,24 @@ const StockMovementPage: React.FC = () => {
     const sheetData = [headersRow1, headersRow2, ...rows];
 
     const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
+
+    // ✅ Auto-adjust column widths based on maximum cell length
+    const columnWidths = sheetData[0].map((_, colIndex) => {
+      const maxWidth = sheetData.reduce((max, row) => {
+        const cell = row[colIndex];
+        const cellLength = cell ? cell.toString().length : 0;
+        return Math.max(max, cellLength);
+      }, 10); // Minimum column width
+      return { wch: maxWidth + 2 }; // +2 for padding
+    });
+
+    worksheet['!cols'] = columnWidths;
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Stock Movement');
     XLSX.writeFile(workbook, 'stock_movement.xlsx');
   };
+
 
 
   const baseColumns = [
@@ -179,8 +194,13 @@ const StockMovementPage: React.FC = () => {
           {data.length > 0 && (
             <Box>
               <Box mb={2}>
-                <Button variant="outlined" onClick={exportToExcel}>
-                  Export to Excel
+                <Button 
+                  variant="outlined" 
+                  color="success" 
+                  onClick={exportToExcel}
+                  endIcon={<DownloadIcon />}
+                  >
+                  Download
                 </Button>
               </Box>
               <Table
