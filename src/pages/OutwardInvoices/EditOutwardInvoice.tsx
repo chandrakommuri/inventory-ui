@@ -190,7 +190,7 @@ const EditOutwardInvoice: React.FC = () => {
           'Content-Type': 'application/json',
         },
       });
-      navigate('/outward-invoices');
+      navigate(`/outward-invoices/view/${formattedValues.id}`);
     } catch (error) {
       console.error('Error updating invoice:', error);
     }

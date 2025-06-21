@@ -169,12 +169,12 @@ const AddOutwardInvoice: React.FC = () => {
     };
 
     try {
-      await api.post(CREATE_OUTWARD_INVOICE_URL, formattedValues, {
+      const resp = await api.post(CREATE_OUTWARD_INVOICE_URL, formattedValues, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      navigate('/outward-invoices');
+      navigate(`/outward-invoices/view/${resp.data.invoiceId}`);
     } catch (error) {
       console.error('Error adding invoice:', error);
     }

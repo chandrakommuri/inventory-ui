@@ -123,12 +123,12 @@ const AddInwardInvoice: React.FC = () => {
     };
 
     try {
-      await api.post(CREATE_INWARD_INVOICE_URL, formattedValues, {
+      const resp = await api.post(CREATE_INWARD_INVOICE_URL, formattedValues, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      navigate('/inward-invoices');
+      navigate(`/inward-invoices/view/${resp.data.invoiceId}`);
     } catch (error) {
       console.error('Error adding invoice:', error);
     }

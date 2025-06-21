@@ -142,15 +142,17 @@ const ViewOutwardInvoice: React.FC = () => {
                     <TableCell>
                     <Box
                       sx={{
-                        display: 'flex'
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 2, // space between columns
                       }}
                     >
                       {imeiColumns.map((column, columnIndex) => (
                         <Box
                           key={columnIndex}
                           sx={{
-                            flex: '1 1 100%',            // full width on xs
-                            maxWidth: { xs: '100%', sm: '50%', md: '33.33%' },  // responsive widths for sm and md
+                            flex: '1 1 120px', // column will take at least 120px
+                            maxWidth: '200px', // limits overflow
                           }}
                         >
                           {column.map((imei, imeiIndex) => (
@@ -169,8 +171,11 @@ const ViewOutwardInvoice: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
-      <Button variant="outlined" color="primary" style={{ marginTop: '20px'}} onClick={() => navigate('/outward-invoices')}>
+      <Button variant="outlined" color="primary" style={{ marginTop: '20px', marginRight: '20px'}} onClick={() => navigate('/outward-invoices')}>
         Back
+      </Button>
+      <Button variant="outlined" color="secondary" style={{ marginTop: '20px'}} onClick={() => navigate(`/outward-invoices/edit/${invoice.id}`)}>
+        Edit
       </Button>
     </Paper>
   );
