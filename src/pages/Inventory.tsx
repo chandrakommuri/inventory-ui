@@ -10,14 +10,22 @@ import api from '../Api';
 const Inventory: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const response = await api.get<Product[]>(GET_ALL_PRODUCTS_URL);
-      const data = response.data;
-      let sno = 1;
-      data.forEach(p => p.sno = sno++);
-      setProducts(data);
+      try {
+        setLoading(true);
+        const response = await api.get<Product[]>(GET_ALL_PRODUCTS_URL);
+        const data = response.data;
+        let sno = 1;
+        data.forEach(p => p.sno = sno++);
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching inventory:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchProducts();
   }, []);
@@ -94,6 +102,7 @@ const Inventory: React.FC = () => {
         }}
         pageSizeOptions={[20, 50, 100]} 
         getRowId={(row) => row.id}
+        loading={loading}
         autoHeight
       />      
     </Paper>

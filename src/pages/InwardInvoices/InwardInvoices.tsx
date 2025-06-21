@@ -14,15 +14,23 @@ import api from '../../Api';
 
 const InwardInvoices: React.FC = () => {
   const [invoices, setInvoices] = useState<InwardInvoice[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInvoices = async () => {
-      const response = await api.get<InwardInvoice[]>(GET_ALL_INWARD_INVOICES_URL);
-      const data = response.data;
-      let sno = 1;
-      data.forEach(i => i.sno = sno++);
-      setInvoices(data);
+      try {
+        setLoading(true);
+        const response = await api.get<InwardInvoice[]>(GET_ALL_INWARD_INVOICES_URL);
+        const data = response.data;
+        let sno = 1;
+        data.forEach(i => i.sno = sno++);
+        setInvoices(data);
+      } catch (error) {
+        console.error('Error fetching inward invoices:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchInvoices();
   }, []);
@@ -121,6 +129,7 @@ const InwardInvoices: React.FC = () => {
           },
         }}
         pageSizeOptions={[10, 20, 50, 100]}
+        loading={loading}
         autoHeight
       />
     </Paper>

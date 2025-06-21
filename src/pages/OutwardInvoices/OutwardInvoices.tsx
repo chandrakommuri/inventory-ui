@@ -13,11 +13,13 @@ import api from '../../Api';
 
 const OutwardInvoices: React.FC = () => {
   const [invoices, setInvoices] = useState<OutwardInvoice[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
+        setLoading(true);
         const response = await api.get<OutwardInvoice[]>(GET_ALL_OUTWARD_INVOICES_URL);
         const data = response.data;
         let sno = 1;
@@ -25,6 +27,8 @@ const OutwardInvoices: React.FC = () => {
         setInvoices(data);
       } catch (error) {
         console.error('Error fetching outward invoices:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchInvoices();
@@ -129,6 +133,7 @@ const OutwardInvoices: React.FC = () => {
           },
         }}
         pageSizeOptions={[10, 20, 50, 100]}
+        loading={loading}
         autoHeight
       />
     </Paper>
