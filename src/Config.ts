@@ -2,6 +2,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 // Products URLs
 export const PRODUCTS_URL = `${API_URL}/products`;
+export const CREATE_NEW_PRODUCT_URL = PRODUCTS_URL;
 export const GET_ALL_PRODUCTS_URL = PRODUCTS_URL;
 
 // Transporters URLs

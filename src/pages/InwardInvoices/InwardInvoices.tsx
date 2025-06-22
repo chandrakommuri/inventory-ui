@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Button, Paper, IconButton, Box, ThemeProvider } from '@mui/material';
+import { Button, Paper, IconButton, Box, ThemeProvider, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
@@ -15,6 +15,7 @@ import api from '../../Api';
 const InwardInvoices: React.FC = () => {
   const [invoices, setInvoices] = useState<InwardInvoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +35,14 @@ const InwardInvoices: React.FC = () => {
     };
     fetchInvoices();
   }, []);
+
+  const filteredInvoices = invoices.filter((invoice) =>
+    invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
+    invoice.invoiceDate.toLowerCase().includes(search.toLowerCase()) ||
+    invoice.deliveryDate.toLowerCase().includes(search.toLowerCase()) ||
+    invoice.transporter.toLowerCase().includes(search.toLowerCase()) ||
+    invoice.docketNumber.toLowerCase().includes(search.toLowerCase())
+  );
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
@@ -117,8 +126,18 @@ const InwardInvoices: React.FC = () => {
           </Button>
         </Box>
       </Box>
+
+      <TextField
+        label="Search"
+        variant="outlined"
+        fullWidth
+        sx={{ marginBottom: '20px' }}
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
       <DataGrid
-        rows={invoices}
+        rows={filteredInvoices}
         columns={columns}
         getRowId={(row) => row.id}
         initialState={{
