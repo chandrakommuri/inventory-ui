@@ -9,7 +9,6 @@ import {
   Drawer,
   IconButton,
   List,
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
@@ -78,14 +77,13 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
 
-      {/* AppBar with Collapse Button */}
+      {/* AppBar now spans full width */}
       <AppBar
         position="fixed"
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          ml: `${drawerWidth}px`,
-          width: `calc(100% - ${drawerWidth}px)`,
-          transition: 'width 0.3s, margin-left 0.3s',
+          width: '100%',
+          height: 90,
         }}
       >
         <Toolbar>
@@ -93,14 +91,24 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             color="inherit"
             edge="start"
             onClick={handleToggleSidebar}
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, mt: 3 }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h5" noWrap>
-            Sri 4 Way Express Inventory Management
-          </Typography>
         </Toolbar>
+
+        {/* Centered logo */}
+        <Box
+          component="img"
+          src="/logo-white.png"
+          alt="Logo"
+          sx={{
+            height: 90,
+            position: 'absolute',
+            left: '7%',
+            transform: 'translateX(-50%)',
+          }}
+        />
       </AppBar>
 
       {/* Sidebar Drawer */}
@@ -115,6 +123,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             width: drawerWidth,
             transition: 'width 0.3s',
             overflowX: 'hidden',
+            marginTop: '20px'
           },
         }}
       >
@@ -127,7 +136,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         sx={{
           flexGrow: 1,
           p: 3,
-          mt: 8,
+          mt: '90px', // ensures content starts below header
           transition: 'margin-left 0.3s',
         }}
       >

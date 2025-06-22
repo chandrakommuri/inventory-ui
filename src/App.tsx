@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 
 import LoginPage from './pages/LoginPage';
@@ -23,7 +22,6 @@ import PrivateRoute from './PrivateRoute';
 const App: React.FC = () => {
   return (
     <Router basename="/">
-      <Header />
       <Sidebar>
         <Routes>
           <Route path="/" element={<Home />} />
