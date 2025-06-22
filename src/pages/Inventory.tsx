@@ -7,12 +7,14 @@ import {
   Button,
   Snackbar,
   Alert,
+  IconButton,
 } from '@mui/material';
 import { Product } from '../models/Product';
 import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
 import AddIcon from '@mui/icons-material/Add';
-import { GET_ALL_PRODUCTS_URL, CREATE_NEW_PRODUCT_URL } from '../Config';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { GET_ALL_PRODUCTS_URL, CREATE_NEW_PRODUCT_URL, DELETE_RODUCT_URL } from '../Config';
 import api from '../Api';
 import AddProductDialog from './AddProductDialog';
 
@@ -69,6 +71,13 @@ const Inventory: React.FC = () => {
     }
   };
 
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      await api.delete(`${DELETE_RODUCT_URL}${id}`);
+      setProducts(products.filter((product) => product.id !== id));
+    }
+  };
+
   const filteredProducts = products.filter((product) =>
     product.code.toLowerCase().includes(search.toLowerCase()) ||
     product.description.toLowerCase().includes(search.toLowerCase())
@@ -109,6 +118,18 @@ const Inventory: React.FC = () => {
     { field: 'inwardQuantity', headerName: 'Inward Qty', headerAlign: 'center', align: 'center', flex: 1 },
     { field: 'outwardQuantity', headerName: 'Outward Qty', headerAlign: 'center', align: 'center', flex: 1 },
     { field: 'quantity', headerName: 'Physical Qty', headerAlign: 'center', align: 'center', flex: 1 },
+    {
+      field: 'actions',
+      headerName: '',
+      flex: 1,
+      renderCell: (params) => (
+        <Box>
+          <IconButton onClick={() => handleDelete(params.row.id)} color='error' disabled={params.row.quantity !== 0}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      ),
+    },
   ];
 
   return (
