@@ -97,6 +97,7 @@ const ViewInwardInvoice: React.FC = () => {
               { label: 'Delivery Date', value: invoice.deliveryDate },
               { label: 'Transporter', value: invoice.transporter },
               { label: 'Docket Number', value: invoice.docketNumber },
+              { label: 'Damage Reason', value: invoice.damageReason },
             ].map(({ label, value }) => (
               <Box
                 key={label}
@@ -128,11 +129,14 @@ const ViewInwardInvoice: React.FC = () => {
                 <TableCell><strong>Description</strong></TableCell>
                 <TableCell><strong>Quantity</strong></TableCell>
                 <TableCell><strong>IMEIs</strong></TableCell>
+                <TableCell><strong>Damaged Quantity</strong></TableCell>
+                <TableCell><strong>Damaged IMEIs</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {invoice.items.map((item, index) => {
                 const imeiColumns = splitIMEIsIntoColumns(item.imeis, 10); // Split IMEIs into columns of 10
+                const damagedImeiColumns = splitIMEIsIntoColumns(item.damagedImeis, 10); // Split IMEIs into columns of 10
                 return (
                   <TableRow key={index}>
                     <TableCell>{item.code}</TableCell>
@@ -147,6 +151,32 @@ const ViewInwardInvoice: React.FC = () => {
                         }}
                       >
                         {imeiColumns.map((column, columnIndex) => (
+                          <Box
+                            key={columnIndex}
+                            sx={{
+                              flex: '1 1 120px', // column will take at least 120px
+                              maxWidth: '200px', // limits overflow
+                            }}
+                          >
+                            {column.map((imei, imeiIndex) => (
+                              <Typography key={imeiIndex} variant="body2">
+                                {imei}
+                              </Typography>
+                            ))}
+                          </Box>
+                        ))}
+                      </Box>
+                    </TableCell>
+                    <TableCell>{item.damagedQuantity}</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 2, // space between columns
+                        }}
+                      >
+                        {damagedImeiColumns.map((column, columnIndex) => (
                           <Box
                             key={columnIndex}
                             sx={{

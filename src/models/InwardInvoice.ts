@@ -3,7 +3,9 @@ export interface InvoiceItem {
     code: string;
     description: string;
     quantity: number;
+    damagedQuantity: number;
     imeis: string[];
+    damagedImeis: string[];
   }
   
 export interface InwardInvoice {
@@ -15,5 +17,6 @@ export interface InwardInvoice {
     transporterId: number;
     transporter: string;
     docketNumber: string;
+    damageReason: string;
     items: InvoiceItem[];
   }

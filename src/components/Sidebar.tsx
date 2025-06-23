@@ -105,7 +105,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           sx={{
             height: 90,
             position: 'absolute',
-            left: '7%',
+            left: '10%',
             transform: 'translateX(-50%)',
           }}
         />

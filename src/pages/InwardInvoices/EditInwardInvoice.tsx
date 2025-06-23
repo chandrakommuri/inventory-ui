@@ -80,6 +80,7 @@ const EditInwardInvoice: React.FC = () => {
           items: invoice.items.map((item) => ({
             ...item,
             imeis: item.imeis.join('\n'), // Convert array to newline-separated string
+            damagedImeis: item.damagedImeis.join('\n'), // Convert array to newline-separated string
           })),
         };
 
@@ -112,6 +113,19 @@ const EditInwardInvoice: React.FC = () => {
       }),
     transporterId: Yup.string().required('Transporter is required'),
     docketNumber: Yup.string().required('Docket Number is required'),
+    // @ts-ignore
+    damageReason: Yup.string().test('damages-exists', 'Damage reason is required when adding damaged items', function(value, context) {
+      const totalQuantity = context.parent.items.reduce(
+        // @ts-ignore
+        (acc, ci) =>
+          acc +
+          (ci.damagedQuantity || 0) +
+          // @ts-ignore
+          ((ci.damagedImeis?.split('\n').filter(i => i.trim()).length) || 0),
+        0
+      );
+      return totalQuantity === 0 || (value && value.length > 0) ;
+    }),
     items: Yup.array().of(
       Yup.object().shape({
         productId: Yup.string().required('Product is required'),
@@ -120,6 +134,11 @@ const EditInwardInvoice: React.FC = () => {
           .min(1, 'Quantity must be at least 1'),
         imeis: Yup.string()
           .required('IMEIs are required')
+          .test('imeis-match-quantity', 'Number of IMEIs must match the quantity', function (value, context) {
+            const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
+            const quantity = context.parent.quantity;
+            return imeis.length === quantity;
+          })
           .test('imeis-contents', 'IMEI should value should be numeric', function (value, context) {
             const numberRegex = /^\d+$/;
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
@@ -131,13 +150,32 @@ const EditInwardInvoice: React.FC = () => {
           })
           .test('imeis-duplicates', 'Duplicate IMEIs found', function (value, context) {
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
-            const quantity = context.parent.quantity;
-            return imeis.length === new Set(imeis).size;
-          })
+            // @ts-ignore
+            const damagedImeis = context.parent.damagedImeis ? context.parent.damagedImeis.split('\n').filter((imei) => imei.trim() !== '') : [];
+            return (imeis.length + damagedImeis.length) === new Set([...imeis, ...damagedImeis]).size;
+          }),
+        damagedQuantity: Yup.number()
+          .min(0, 'Quantity must be at least 0'),
+        damagedImeis: Yup.string()
           .test('imeis-match-quantity', 'Number of IMEIs must match the quantity', function (value, context) {
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
-            const quantity = context.parent.quantity;
+            const quantity = context.parent.damagedQuantity || 0;
             return imeis.length === quantity;
+          })
+          .test('imeis-contents', 'IMEI should value should be numeric', function (value, context) {
+            const numberRegex = /^\d+$/;
+            const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
+            return imeis.every(imei => numberRegex.test(imei));
+          })
+          .test('imeis-length', 'Length of each IMEI must be 15', function (value, context) {
+            const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
+            return imeis.every(imei => imei.length === 15);
+          })
+          .test('imeis-duplicates', 'Duplicate IMEIs found', function (value, context) {
+            const damagedImeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
+            // @ts-ignore
+            const imeis = context.parent.imeis ? context.parent.imeis.split('\n').filter((imei) => imei.trim() !== '') : [];
+            return (imeis.length + damagedImeis.length) === new Set([...imeis, ...damagedImeis]).size;
           }),
       })
     ),
@@ -150,6 +188,7 @@ const EditInwardInvoice: React.FC = () => {
       items: values.items.map((item: any) => ({
         ...item,
         imeis: item.imeis.split('\n').filter((imei: string) => imei.trim() !== ''),
+        damagedImeis: item.damagedImeis.split('\n').filter((imei: string) => imei.trim() !== ''),
       })),
     };
 
@@ -260,6 +299,16 @@ const EditInwardInvoice: React.FC = () => {
               error={touched.docketNumber && Boolean(errors.docketNumber)}
               helperText={touched.docketNumber && errors.docketNumber}
             />
+            <TextField
+              name="damageReason"
+              label="Damage Reason"
+              fullWidth
+              margin="normal"
+              onChange={handleChange}
+              value={values.damageReason}
+              error={touched.damageReason && Boolean(errors.damageReason)}
+              helperText={touched.damageReason && errors.damageReason}
+            />
 
             {/* Items Array */}
             <FieldArray name="items">
@@ -307,52 +356,106 @@ const EditInwardInvoice: React.FC = () => {
                           />
                         )}
                       />
-                      <TextField
-                        name={`items[${index}].quantity`}
-                        label="Quantity"
-                        type="number"
-                        fullWidth
-                        margin="normal"
-                        onChange={handleChange}
-                        value={item.quantity}
-                        error={
-                          touched.items?.[index]?.quantity &&
-                          typeof errors.items?.[index] !== 'string' &&
-                          // @ts-ignore
-                          Boolean(errors.items?.[index]?.quantity)
-                        }
-                        helperText={
-                          touched.items?.[index]?.quantity && 
-                          typeof errors.items?.[index] !== 'string' && 
-                          // @ts-ignore
-                          errors.items?.[index]?.quantity
-                        }
-                        inputProps={{
-                          onWheel: (e) => (e.target as HTMLInputElement).blur(),
-                        }}
-                      />
-                      <TextField
-                        name={`items[${index}].imeis`}
-                        label="IMEIs (Each IMEI on a new line)"
-                        fullWidth
-                        margin="normal"
-                        multiline
-                        rows={4}
-                        onChange={handleChange}
-                        value={item.imeis}
-                        error={
-                          touched.items?.[index]?.imeis &&
-                          typeof errors.items?.[index] !== 'string' &&
-                          // @ts-ignore
-                          Boolean(errors.items?.[index]?.imeis)
-                        }
-                        helperText={
-                          touched.items?.[index]?.imeis && 
-                          typeof errors.items?.[index] !== 'string' && 
-                          // @ts-ignore
-                          errors.items?.[index]?.imeis
-                        }
-                      />
+                      <Box display="flex" gap={2}>
+                        <Box flex={1}>
+                          <Typography variant="subtitle1">Good Products</Typography>
+                          <TextField
+                            name={`items[${index}].quantity`}
+                            label="Quantity"
+                            type="number"
+                            fullWidth
+                            margin="normal"
+                            onChange={handleChange}
+                            value={item.quantity}
+                            error={
+                              touched.items?.[index]?.quantity &&
+                              typeof errors.items?.[index] !== 'string' &&
+                              // @ts-ignore
+                              Boolean(errors.items?.[index]?.quantity)
+                            }
+                            helperText={
+                              touched.items?.[index]?.quantity && 
+                              typeof errors.items?.[index] !== 'string' && 
+                              // @ts-ignore
+                              errors.items?.[index]?.quantity
+                            }
+                            inputProps={{
+                              onWheel: (e) => (e.target as HTMLInputElement).blur(),
+                            }}
+                          />
+                          <TextField
+                            name={`items[${index}].imeis`}
+                            label="IMEIs (Each IMEI on a new line)"
+                            fullWidth
+                            margin="normal"
+                            multiline
+                            rows={4}
+                            onChange={handleChange}
+                            value={item.imeis}
+                            error={
+                              touched.items?.[index]?.imeis &&
+                              typeof errors.items?.[index] !== 'string' &&
+                              // @ts-ignore
+                              Boolean(errors.items?.[index]?.imeis)
+                            }
+                            helperText={
+                              touched.items?.[index]?.imeis && 
+                              typeof errors.items?.[index] !== 'string' && 
+                              // @ts-ignore
+                              errors.items?.[index]?.imeis
+                            }
+                          />
+                        </Box>
+                        <Box flex={1}>
+                          <Typography variant="subtitle1">Damaged Products</Typography>
+                          <TextField
+                            name={`items[${index}].damagedQuantity`}
+                            label="Quantity"
+                            type="number"
+                            fullWidth
+                            margin="normal"
+                            onChange={handleChange}
+                            value={item.damagedQuantity}
+                            error={
+                              touched.items?.[index]?.damagedQuantity &&
+                              typeof errors.items?.[index] !== 'string' &&
+                              // @ts-ignore
+                              Boolean(errors.items?.[index]?.damagedQuantity)
+                            }
+                            helperText={
+                              touched.items?.[index]?.damagedQuantity && 
+                              typeof errors.items?.[index] !== 'string' && 
+                              // @ts-ignore
+                              errors.items?.[index]?.damagedQuantity
+                            }
+                            inputProps={{
+                              onWheel: (e) => (e.target as HTMLInputElement).blur(),
+                            }}
+                          />
+                          <TextField
+                            name={`items[${index}].damagedImeis`}
+                            label="IMEIs (Each IMEI on a new line)"
+                            fullWidth
+                            margin="normal"
+                            multiline
+                            rows={4}
+                            onChange={handleChange}
+                            value={item.damagedImeis}
+                            error={
+                              touched.items?.[index]?.damagedImeis &&
+                              typeof errors.items?.[index] !== 'string' &&
+                              // @ts-ignore
+                              Boolean(errors.items?.[index]?.damagedImeis)
+                            }
+                            helperText={
+                              touched.items?.[index]?.damagedImeis && 
+                              typeof errors.items?.[index] !== 'string' && 
+                              // @ts-ignore
+                              errors.items?.[index]?.damagedImeis
+                            }
+                          />
+                        </Box>
+                      </Box>
                       <Button
                         onClick={() => remove(index)}
                         variant="contained"
@@ -365,7 +468,7 @@ const EditInwardInvoice: React.FC = () => {
                     </Box>
                   ))}
                   <Button
-                    onClick={() => push({ productId: '', quantity: 0, imeis: '' })}
+                    onClick={() => push({ productId: '', quantity: 0, imeis: '', damagedQuantity: 0, damagedImeis: '' })}
                     variant="contained"
                     color="secondary"
                     style={{ marginTop: '20px' }}
