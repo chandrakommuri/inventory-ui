@@ -141,7 +141,7 @@ const EditOutwardInvoice: React.FC = () => {
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
             return imeis.every(imei => numberRegex.test(imei));
           })
-          .test('imeis-length', 'Length of each IMEI must be 15', function (value, context) {
+          .test('imeis-length', 'Length of each IMEI must be 15 or 18', function (value, context) {
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
             return imeis.every(imei => imei.length === 15 || imei.length === 18);
           })
