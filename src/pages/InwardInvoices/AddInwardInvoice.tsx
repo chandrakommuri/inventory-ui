@@ -115,7 +115,7 @@ const AddInwardInvoice: React.FC = () => {
           })
           .test('imeis-length', 'Length of each IMEI must be 15', function (value, context) {
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
-            return imeis.every(imei => imei.length === 15);
+            return imeis.every(imei => imei.length === 15 || imei.length === 18);
           })
           .test('imeis-duplicates', 'Duplicate IMEIs found', function (value, context) {
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
@@ -138,7 +138,7 @@ const AddInwardInvoice: React.FC = () => {
           })
           .test('imeis-length', 'Length of each IMEI must be 15', function (value, context) {
             const imeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
-            return imeis.every(imei => imei.length === 15);
+            return imeis.every(imei => imei.length === 15 || imei.length === 18);
           })
           .test('imeis-duplicates', 'Duplicate IMEIs found', function (value, context) {
             const damagedImeis = value ? value.split('\n').filter((imei) => imei.trim() !== '') : [];
