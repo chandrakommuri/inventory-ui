@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Formik, Form, FieldArray } from 'formik';
 import * as Yup from 'yup';
-import { Button, Paper, TextField, Box, Typography, CircularProgress } from '@mui/material';
+import { Button, Paper, TextField, Box, Typography, CircularProgress, Checkbox, FormControlLabel, Switch } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../../models/Product';
@@ -64,7 +64,7 @@ const AddInwardInvoice: React.FC = () => {
     transporterId: '',
     docketNumber: '',
     damageReason: '',
-    items: [{ productId: '', quantity: 0, imeis: '', damagedQuantity: 0, damagedImeis: '' }], // IMEIs as a single string
+    items: [{ productId: '', quantity: 0, demoItems: false, imeis: '', damagedQuantity: 0, damagedImeis: '' }], // IMEIs as a single string
   };
 
   // Validation schema for the form using Yup
@@ -101,6 +101,7 @@ const AddInwardInvoice: React.FC = () => {
         quantity: Yup.number()
           .required('Quantity is required')
           .min(1, 'Quantity must be at least 1'),
+        demoItems: Yup.bool(),
         imeis: Yup.string()
           .required('IMEIs are required')
           .test('imeis-match-quantity', 'Number of IMEIs must match the quantity', function (value, context) {
@@ -309,6 +310,25 @@ const AddInwardInvoice: React.FC = () => {
                           )}
                         />
                       )}
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            name={`items[${index}].demoItems`}
+                            checked={item.demoItems}
+                            onChange={(e) => {
+                              const value = e.target.checked;
+                              if (value) {
+                                const confirmed = window.confirm("Are you sure you want to add this as 'Demo items'?");
+                                if (!confirmed) return;
+                              }
+                              setFieldValue(`items[${index}].demoItems`, value);
+                            }}
+                          />
+                        }
+                        label="Demo items?"
+                        labelPlacement="start"
+                        sx={{ my: 2, ml: 0.5 }}
+                      />
                       <Box display="flex" gap={2}>
                         <Box flex={1}>
                           <Typography variant="subtitle1">Good Products</Typography>

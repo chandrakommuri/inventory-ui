@@ -2,6 +2,7 @@ export interface OutwardInvoiceItem {
     productId: number;
     code: string;
     description: string;
+    demoItems: boolean;
     quantity: number;
     imeis: string[];
   }

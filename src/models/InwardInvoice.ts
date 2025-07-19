@@ -2,6 +2,7 @@ export interface InvoiceItem {
     productId: number;
     code: string;
     description: string;
+    demoItems: boolean;
     quantity: number;
     damagedQuantity: number;
     imeis: string[];

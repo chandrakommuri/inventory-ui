@@ -127,6 +127,7 @@ const ViewInwardInvoice: React.FC = () => {
               <TableRow>
                 <TableCell><strong>Product Code</strong></TableCell>
                 <TableCell><strong>Description</strong></TableCell>
+                <TableCell><strong>Demo Items?</strong></TableCell>
                 <TableCell><strong>Quantity</strong></TableCell>
                 <TableCell><strong>IMEIs</strong></TableCell>
                 <TableCell><strong>Damaged Quantity</strong></TableCell>
@@ -141,6 +142,7 @@ const ViewInwardInvoice: React.FC = () => {
                   <TableRow key={index}>
                     <TableCell>{item.code}</TableCell>
                     <TableCell>{item.description}</TableCell>
+                    <TableCell>{item.demoItems?'Yes':'No'}</TableCell>
                     <TableCell>{item.quantity}</TableCell>
                     <TableCell>
                       <Box

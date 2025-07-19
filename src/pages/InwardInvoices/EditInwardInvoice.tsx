@@ -9,6 +9,8 @@ import {
   Box,
   Typography,
   CircularProgress,
+  Switch,
+  FormControlLabel,
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import { InwardInvoice } from '../../models/InwardInvoice';
@@ -132,6 +134,7 @@ const EditInwardInvoice: React.FC = () => {
         quantity: Yup.number()
           .required('Quantity is required')
           .min(1, 'Quantity must be at least 1'),
+        demoItems: Yup.bool(),
         imeis: Yup.string()
           .required('IMEIs are required')
           .test('imeis-match-quantity', 'Number of IMEIs must match the quantity', function (value, context) {
@@ -355,6 +358,25 @@ const EditInwardInvoice: React.FC = () => {
                             }
                           />
                         )}
+                      />
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            name={`items[${index}].demoItems`}
+                            checked={item.demoItems}
+                            onChange={(e) => {
+                              const value = e.target.checked;
+                              if (value) {
+                                const confirmed = window.confirm("Are you sure you want to add this as 'Demo items'?");
+                                if (!confirmed) return;
+                              }
+                              setFieldValue(`items[${index}].demoItems`, value);
+                            }}
+                          />
+                        }
+                        label="Demo items?"
+                        labelPlacement="start"
+                        sx={{ my: 2, ml: 0.5 }}
                       />
                       <Box display="flex" gap={2}>
                         <Box flex={1}>
