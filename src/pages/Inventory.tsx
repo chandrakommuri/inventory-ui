@@ -8,6 +8,10 @@ import {
   Snackbar,
   Alert,
   IconButton,
+  Typography,
+  CardContent,
+  Grid,
+  Card,
 } from '@mui/material';
 import { Product } from '../models/Product';
 import * as XLSX from 'xlsx';
@@ -83,6 +87,21 @@ const Inventory: React.FC = () => {
     product.description.toLowerCase().includes(search.toLowerCase())
   );
 
+  const total_cards = [
+    {
+      title: "Total Inward Quantity",
+      total: products.reduce((sum, row) => sum + row.inwardQuantity, 0)
+    },
+    {
+      title: "Total Outward Quantity",
+      total: products.reduce((sum, row) => sum + row.outwardQuantity, 0)
+    },
+    {
+      title: "Total Physical Quantity",
+      total: products.reduce((sum, row) => sum + row.quantity, 0),
+    }
+  ];
+
   const exportToExcel = () => {
     const headersRow = ['S. No', 'Product Code', 'Product Description', 'Inward Qty', 'Outward Qty', 'Physical Qty'];
     const rows = products.map(product => [
@@ -155,6 +174,21 @@ const Inventory: React.FC = () => {
           </Button>
         </Box>
       </Box>
+
+      <Grid container spacing={2} mb={2}>
+        {total_cards.map((card, index) => (
+          <Grid size={{  xs: 6, sm: 4 }}>
+          <Card variant="elevation" sx={{ backgroundColor: '#e3f2fd' }}>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary">
+                {card.title}
+              </Typography>
+              <Typography variant="h6">{card.total}</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        ))}
+      </Grid>
 
       <TextField
         label="Search"
