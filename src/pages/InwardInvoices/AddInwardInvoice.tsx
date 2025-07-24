@@ -11,6 +11,7 @@ import { CREATE_INWARD_INVOICE_URL, GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_U
 import { Transporter } from '../../models/Transporter';
 import DateFieldWithClick from '../../components/DateFieldWithClick';
 import api from '../../Api';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 
 const AddInwardInvoice: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const AddInwardInvoice: React.FC = () => {
   // State to hold the list of products
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState<boolean>(true);
+  const [confirm, DemoItemsConfirmDialog] = useConfirmDialog();
 
   // Fetch products from the API
   useEffect(() => {
@@ -315,10 +317,12 @@ const AddInwardInvoice: React.FC = () => {
                           <Switch
                             name={`items[${index}].demoItems`}
                             checked={item.demoItems}
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const value = e.target.checked;
                               if (value) {
-                                const confirmed = window.confirm("Are you sure you want to add this as 'Demo items'?");
+                                const confirmed = await confirm({
+                                  message: "Are you sure you want to add this as 'Demo items'?",
+                                });
                                 if (!confirmed) return;
                               }
                               setFieldValue(`items[${index}].demoItems`, value);
@@ -462,6 +466,7 @@ const AddInwardInvoice: React.FC = () => {
           </Form>
         )}
       </Formik>
+      {DemoItemsConfirmDialog}
     </Paper>
   );
 };
