@@ -12,6 +12,7 @@ import {
   CardContent,
   Grid,
   Card,
+  Skeleton,
 } from '@mui/material';
 import { Product } from '../models/Product';
 import * as XLSX from 'xlsx';
@@ -178,15 +179,19 @@ const Inventory: React.FC = () => {
       <Grid container spacing={2} mb={2}>
         {total_cards.map((card, index) => (
           <Grid size={{  xs: 6, sm: 4 }}>
-          <Card variant="elevation" sx={{ backgroundColor: '#e3f2fd' }}>
-            <CardContent>
-              <Typography variant="subtitle2" color="text.secondary">
-                {card.title}
-              </Typography>
-              <Typography variant="h6">{card.total}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+            <Card variant="elevation" sx={{ backgroundColor: '#e3f2fd' }}>
+              <CardContent>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {card.title}
+                </Typography>
+                {loading ? (
+                  <Skeleton variant="text" width={80} height={32} />
+                ) : (
+                  <Typography variant="h6">{card.total}</Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
       </Grid>
 
