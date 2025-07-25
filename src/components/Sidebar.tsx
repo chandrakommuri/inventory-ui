@@ -1,20 +1,21 @@
-// src/components/Layout/SidebarLayout.tsx
-
 import React, { useState } from 'react';
 import {
   AppBar,
+  Avatar,
   Box,
   CssBaseline,
   Divider,
-  Drawer,
   IconButton,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
   Toolbar,
   Tooltip,
   Typography,
+  useTheme,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -25,18 +26,38 @@ import {
   SyncAlt,
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+
 
 const expandedWidth = 240;
-const collapsedWidth = 60;
+const collapsedWidth = 64;
 
 const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
   };
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear(); // You can refine this to only remove Google token if needed
+    window.location.href = '/login';
+  };
+
+  const token = localStorage.getItem('token');
+  const user = token ? (jwtDecode(token) as { name: string; email: string; picture: string }) : null;
 
   const menuItems = [
     { text: 'Home', icon: <Home />, path: '/' },
@@ -48,96 +69,93 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const drawerWidth = isSidebarOpen ? expandedWidth : collapsedWidth;
 
-  const drawerContent = (
-    <>
-      <Toolbar />
-      <Divider />
-      <List>
-        {menuItems.map(({ text, icon, path }) => (
-          <Tooltip title={!isSidebarOpen ? text : ''} placement="right" key={text}>
-            <ListItemButton
-              selected={location.pathname === path}
-              onClick={() => navigate(path)}
-              sx={{ justifyContent: isSidebarOpen ? 'initial' : 'center' }}
-            >
-              <ListItemIcon
-                sx={{ minWidth: 0, mr: isSidebarOpen ? 2 : 'auto', justifyContent: 'center' }}
-              >
-                {icon}
-              </ListItemIcon>
-              {isSidebarOpen && <ListItemText primary={text} />}
-            </ListItemButton>
-          </Tooltip>
-        ))}
-      </List>
-    </>
-  );
-
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
 
-      {/* AppBar now spans full width */}
       <AppBar
         position="fixed"
+        color="primary"
+        elevation={1}
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          width: '100%',
-          height: 90,
+          height: 72,
+          justifyContent: 'center',
+          px: 2,
         }}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={handleToggleSidebar}
-            sx={{ mr: 2, mt: 3 }}
-          >
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: '72px' }}>
+          <IconButton color="inherit" edge="start" onClick={handleToggleSidebar} sx={{ ml: 1 }}>
             <MenuIcon />
           </IconButton>
-        </Toolbar>
 
-        {/* Centered logo */}
-        <Box
-          component="img"
-          src="/logo-white.png"
-          alt="Logo"
-          sx={{
-            height: 90,
-            position: 'absolute',
-            left: '10%',
-            transform: 'translateX(-50%)',
-          }}
-        />
+          <Box component="img" src="/logo-white.png" alt="Logo" sx={{ height: 48 }} />
+
+          {user && (
+            <Box>
+              <IconButton onClick={handleProfileMenuOpen}>
+                <Avatar src={user.picture} alt={user.name} />
+              </IconButton>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+                <MenuItem disabled>{user.name}</MenuItem>
+                <MenuItem disabled>{user.email}</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </Box>
+          )}
+        </Toolbar>
       </AppBar>
 
-      {/* Sidebar Drawer */}
-      <Drawer
-        variant="permanent"
-        open={isSidebarOpen}
+      <Box
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          whiteSpace: 'nowrap',
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            transition: 'width 0.3s',
-            overflowX: 'hidden',
-            marginTop: '20px'
-          },
+          height: '100vh',
+          position: 'fixed',
+          top: 72,
+          left: 0,
+          bgcolor: theme.palette.background.paper,
+          borderRight: '1px solid #ddd',
+          overflowX: 'hidden',
+          transition: 'width 0.3s',
         }}
       >
-        {drawerContent}
-      </Drawer>
+        <List>
+          {menuItems.map(({ text, icon, path }) => (
+            <Tooltip title={!isSidebarOpen ? text : ''} placement="right" key={text}>
+              <ListItemButton
+                selected={location.pathname === path}
+                onClick={() => navigate(path)}
+                sx={{
+                  justifyContent: isSidebarOpen ? 'initial' : 'center',
+                  px: 2,
+                  py: 1.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: isSidebarOpen ? 2 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {icon}
+                </ListItemIcon>
+                {isSidebarOpen && <ListItemText primary={text} />}
+              </ListItemButton>
+            </Tooltip>
+          ))}
+        </List>
+      </Box>
 
-      {/* Main Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
+          ml: `${drawerWidth}px`,
+          mt: '72px',
           p: 3,
-          mt: '90px', // ensures content starts below header
-          transition: 'margin-left 0.3s',
+          transition: 'margin 0.3s',
         }}
       >
         {children}

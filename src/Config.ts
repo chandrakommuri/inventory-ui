@@ -1,5 +1,7 @@
 const API_URL = process.env.REACT_APP_API_URL;
 
+export const DASHBOARD_SUMMARY_URL = `${API_URL}/dashboard-summary`
+
 // Products URLs
 export const PRODUCTS_URL = `${API_URL}/products`;
 export const CREATE_NEW_PRODUCT_URL = PRODUCTS_URL;

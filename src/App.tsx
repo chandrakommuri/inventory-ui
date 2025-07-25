@@ -18,13 +18,14 @@ import EditOutwardInvoice from './pages/OutwardInvoices/EditOutwardInvoice';
 import ViewOutwardInvoice from './pages/OutwardInvoices/ViewOutwardInvoice';
 import StockMovementPage from './pages/StockMovementPage';
 import PrivateRoute from './PrivateRoute';
+import Dashboard from './pages/Dashboard';
 
 const App: React.FC = () => {
   return (
     <Router basename="/">
       <Sidebar>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/login" element={<LoginPage />} />
           
           <Route path="/inventory" element={<PrivateRoute><Inventory /></PrivateRoute>} />

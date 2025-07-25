@@ -128,7 +128,8 @@ const Inventory: React.FC = () => {
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventory');
-    XLSX.writeFile(workbook, 'inventory.xlsx');
+    const today = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(workbook, `inventory_${today}.xlsx`);
   };
 
   const columns: GridColDef[] = [
