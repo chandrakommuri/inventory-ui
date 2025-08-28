@@ -7,12 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import { Product } from '../../models/Product';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { CREATE_OUTWARD_INVOICE_URL, GET_ALL_CUSTOMERS_URL, GET_ALL_DESTINATIONS_URL, GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_URL } from '../../Config';
+import { CREATE_NEW_CUSTOMER_URL, CREATE_NEW_DESTINATION_URL, CREATE_NEW_TRANSPORTER_URL, CREATE_OUTWARD_INVOICE_URL, GET_ALL_CUSTOMERS_URL, GET_ALL_DESTINATIONS_URL, GET_ALL_PRODUCTS_URL, GET_ALL_TRANSPORTERS_URL } from '../../Config';
 import { Transporter } from '../../models/Transporter';
 import { Customer } from '../../models/Customer';
 import { Destination } from '../../models/Destination';
 import DateFieldWithClick from '../../components/DateFieldWithClick';
-import api from '../../Api'
+import api from '../../Api';
+import AddableAutocomplete from '../../components/AddableAutocomplete';
 
 const AddOutwardInvoice: React.FC = () => {
   const navigate = useNavigate();
@@ -98,9 +99,9 @@ const AddOutwardInvoice: React.FC = () => {
   const initialValues = {
     invoiceNumber: '',
     invoiceDate: '',
-    customerId: '',
-    destinationId: '',
-    transporterId: '',
+    customerId: 0,
+    destinationId: 0,
+    transporterId: 0,
     docketNumber: '',
     items: [{ productId: '', quantity: 0, imeis: '' }],
   };
@@ -213,73 +214,43 @@ const AddOutwardInvoice: React.FC = () => {
             {loadingCustomers ? (
               <CircularProgress size={24} />
             ) : (
-              <Autocomplete
+              <AddableAutocomplete
+                value={customers.find((c) => c.id === values.customerId) || null}
+                onChange={(val) => setFieldValue('customerId', val?.id || '')}
                 options={customers}
-                getOptionLabel={(option) => `${option.name}`}
-                filterOptions={(options, { inputValue }) =>
-                  options.filter((option) =>option.name.toLowerCase().includes(inputValue.toLowerCase()))
-                }
-                onChange={(event, value) => {
-                  // Set the customerId in Formik when a customerI is selected
-                  setFieldValue(`customerId`, value?.id || '');
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Customer"
-                    margin="normal"
-                    error={touched.customerId && Boolean(errors.customerId)}
-                    helperText={touched.customerId && errors.customerId}
-                  />
-                )}
+                setOptions={setCustomer}
+                createUrl={CREATE_NEW_CUSTOMER_URL}
+                label="Customer"
+                error={touched.customerId && Boolean(errors.customerId)}
+                helperText={touched.customerId && errors.customerId}
               />
             )}
             {loadingDestinations ? (
               <CircularProgress size={24} />
             ) : (
-              <Autocomplete
+              <AddableAutocomplete
+                value={destinations.find((c) => c.id === values.destinationId) || null}
+                onChange={(val) => setFieldValue('destinationId', val?.id || '')}
                 options={destinations}
-                getOptionLabel={(option) => `${option.name}`}
-                filterOptions={(options, { inputValue }) =>
-                  options.filter((option) =>option.name.toLowerCase().includes(inputValue.toLowerCase()))
-                }
-                onChange={(event, value) => {
-                  // Set the destinationId in Formik when a destination is selected
-                  setFieldValue(`destinationId`, value?.id || '');
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Destination"
-                    margin="normal"
-                    error={touched.destinationId && Boolean(errors.destinationId)}
-                    helperText={touched.destinationId && errors.destinationId}
-                  />
-                )}
+                setOptions={setDestination}
+                createUrl={CREATE_NEW_DESTINATION_URL}
+                label="Destination"
+                error={touched.destinationId && Boolean(errors.destinationId)}
+                helperText={touched.destinationId && errors.destinationId}
               />
             )}
             {loadingTransporters ? (
               <CircularProgress size={24} />
             ) : (
-              <Autocomplete
+              <AddableAutocomplete
+                value={transporters.find((c) => c.id === values.transporterId) || null}
+                onChange={(val) => setFieldValue('transporterId', val?.id || '')}
                 options={transporters}
-                getOptionLabel={(option) => `${option.name}`}
-                filterOptions={(options, { inputValue }) =>
-                  options.filter((option) =>option.name.toLowerCase().includes(inputValue.toLowerCase()))
-                }
-                onChange={(event, value) => {
-                  // Set the transporterId in Formik when a transporter is selected
-                  setFieldValue(`transporterId`, value?.id || '');
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Transporter"
-                    margin="normal"
-                    error={touched.transporterId && Boolean(errors.transporterId)}
-                    helperText={touched.transporterId && errors.transporterId}
-                  />
-                )}
+                setOptions={setTransporters}
+                createUrl={CREATE_NEW_TRANSPORTER_URL}
+                label="Transporter"
+                error={touched.transporterId && Boolean(errors.transporterId)}
+                helperText={touched.transporterId && errors.transporterId}
               />
             )}
             <TextField

@@ -1,4 +1,4 @@
-export interface Destination {
-    id: number;
-    name: string;
+import { Option } from "./Option";
+
+export interface Destination extends Option {
 }

@@ -1,4 +1,4 @@
-export interface Customer {
-    id: number;
-    name: string;
+import { Option } from "./Option";
+
+export interface Customer extends Option {
 }

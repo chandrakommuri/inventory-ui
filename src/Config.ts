@@ -11,14 +11,17 @@ export const DELETE_RODUCT_URL = `${PRODUCTS_URL}/`;
 // Transporters URLs
 export const TRANSPORTERS_URL = `${API_URL}/transporters`;
 export const GET_ALL_TRANSPORTERS_URL = TRANSPORTERS_URL;
+export const CREATE_NEW_TRANSPORTER_URL = TRANSPORTERS_URL;
 
 // Customers URLs
 export const CUSTOMERS_URL = `${API_URL}/customers`;
 export const GET_ALL_CUSTOMERS_URL = CUSTOMERS_URL;
+export const CREATE_NEW_CUSTOMER_URL = CUSTOMERS_URL;
 
 // Destinations URLs
 export const DESTINATIONS_URL = `${API_URL}/destinations`;
 export const GET_ALL_DESTINATIONS_URL = DESTINATIONS_URL;
+export const CREATE_NEW_DESTINATION_URL = DESTINATIONS_URL;
 
 // Inward Invoices URLs
 export const INWARD_INVOICES_URL = `${API_URL}/inward-invoices`;

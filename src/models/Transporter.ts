@@ -1,4 +1,4 @@
-export interface Transporter {
-    id: number;
-    name: string;
+import { Option } from "./Option";
+
+export interface Transporter extends Option {
 }
